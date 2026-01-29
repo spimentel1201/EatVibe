@@ -1,8 +1,8 @@
 package com.foodrush.restaurant.infrastructure.persistence.adapter;
 
-import main.java.com.foodrush.restaurant.domain.model.MenuItem;
-import main.java.com.foodrush.restaurant.domain.repository.MenuItemRepository;
-import main.java.com.foodrush.restaurant.infrastructure.persistence.repository.MenuItemJpaRepository;
+import com.foodrush.restaurant.domain.model.MenuItem;
+import com.foodrush.restaurant.domain.repository.MenuItemRepository;
+import com.foodrush.restaurant.infrastructure.persistence.repository.MenuItemJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

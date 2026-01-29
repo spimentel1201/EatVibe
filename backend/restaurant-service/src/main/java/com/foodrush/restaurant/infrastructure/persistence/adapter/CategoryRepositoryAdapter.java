@@ -1,8 +1,8 @@
 package com.foodrush.restaurant.infrastructure.persistence.adapter;
 
-import main.java.com.foodrush.restaurant.domain.model.Category;
-import main.java.com.foodrush.restaurant.domain.repository.CategoryRepository;
-import main.java.com.foodrush.restaurant.infrastructure.persistence.repository.CategoryJpaRepository;
+import com.foodrush.restaurant.domain.model.Category;
+import com.foodrush.restaurant.domain.repository.CategoryRepository;
+import com.foodrush.restaurant.infrastructure.persistence.repository.CategoryJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

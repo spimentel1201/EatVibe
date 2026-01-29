@@ -1,6 +1,6 @@
 package com.foodrush.restaurant.domain.repository;
 
-import main.java.com.foodrush.restaurant.domain.model.Category;
+import com.foodrush.restaurant.domain.model.Category;
 
 import java.util.List;
 import java.util.Optional;

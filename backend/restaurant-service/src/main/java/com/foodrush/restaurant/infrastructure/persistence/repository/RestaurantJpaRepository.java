@@ -1,6 +1,6 @@
 package com.foodrush.restaurant.infrastructure.persistence.repository;
 
-import main.java.com.foodrush.restaurant.domain.model.Restaurant;
+import com.foodrush.restaurant.domain.model.Restaurant;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

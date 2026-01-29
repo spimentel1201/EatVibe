@@ -1,4 +1,4 @@
-package com.foodrush.restaurant.domain.exception;
+package main.java.com.foodrush.restaurant.domain.exception;
 
 import java.util.UUID;
 

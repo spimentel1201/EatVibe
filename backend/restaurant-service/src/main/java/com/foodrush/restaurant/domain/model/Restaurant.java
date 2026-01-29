@@ -1,4 +1,4 @@
-package com.foodrush.restaurant.domain.model;
+package main.java.com.foodrush.restaurant.domain.model;
 
 import jakarta.persistence.*;
 import lombok.*;

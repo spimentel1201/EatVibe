@@ -1,4 +1,4 @@
-package com.foodrush.restaurant.domain.exception;
+package main.java.com.foodrush.restaurant.domain.exception;
 
 public class DuplicateRestaurantNameException extends RuntimeException {
 

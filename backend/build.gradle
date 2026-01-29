@@ -1,0 +1,109 @@
+// ============================================
+// FoodRush Backend - Root Build Configuration
+// ============================================
+
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.2.2' apply false
+    id 'io.spring.dependency-management' version '1.1.4' apply false
+}
+
+// Configuración común para todos los subproyectos
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+
+    group = 'com.foodrush'
+    version = '1.0.0'
+    
+    java {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    repositories {
+        mavenCentral()
+    }
+
+    // Dependencias comunes para todos los microservicios
+    dependencies {
+        // Lombok
+        compileOnly 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok'
+
+        // Spring Boot Actuator
+        implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+        // Micrometer para métricas
+        runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+
+        // Testing
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+        testImplementation 'org.mockito:mockito-core'
+        testImplementation 'org.mockito:mockito-junit-jupiter'
+        
+        // Lombok para tests
+        testCompileOnly 'org.projectlombok:lombok'
+        testAnnotationProcessor 'org.projectlombok:lombok'
+    }
+
+    tasks.named('test') {
+        useJUnitPlatform()
+        
+        // Configuración de JaCoCo para cobertura
+        finalizedBy jacocoTestReport
+    }
+
+    // Configuración de JaCoCo
+    apply plugin: 'jacoco'
+    
+    jacoco {
+        toolVersion = "0.8.11"
+    }
+
+    jacocoTestReport {
+        dependsOn test
+        
+        reports {
+            xml.required = true
+            html.required = true
+            csv.required = false
+        }
+
+        afterEvaluate {
+            classDirectories.setFrom(files(classDirectories.files.collect {
+                fileTree(dir: it, exclude: [
+                    '**/config/**',
+                    '**/dto/**',
+                    '**/entity/**',
+                    '**/exception/**',
+                    '**/*Application.class'
+                ])
+            }))
+        }
+    }
+
+    jacocoTestCoverageVerification {
+        violationRules {
+            rule {
+                limit {
+                    minimum = 0.80 // 80% cobertura mínima
+                }
+            }
+        }
+    }
+
+    // Configuración de encoding
+    tasks.withType(JavaCompile) {
+        options.encoding = 'UTF-8'
+    }
+}
+
+// Versiones centralizadas
+ext {
+    set('springCloudVersion', "2023.0.0")
+    set('mapstructVersion', "1.5.5.Final")
+    set('springdocVersion', "2.3.0")
+    set('testcontainersVersion', "1.19.3")
+}

@@ -1,0 +1,15 @@
+rootProject.name = 'foodrush-backend'
+
+// Microservicios de infraestructura
+include 'eureka-server'
+include 'config-server'
+include 'api-gateway'
+
+// Microservicios de negocio
+include 'auth-service'
+include 'user-service'
+include 'restaurant-service'
+include 'order-service'
+include 'payment-service'
+include 'courier-service'
+include 'notification-service'

@@ -6,7 +6,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/orders_db
     username: foodrush
-    password: foodrush123
+    password: foodrush_dev_2026
     driver-class-name: org.postgresql.Driver
   
   # JPA Configuration

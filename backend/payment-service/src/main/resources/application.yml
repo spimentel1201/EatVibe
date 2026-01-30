@@ -51,12 +51,14 @@ payment:
     enabled: true
     simulation-mode: true
 
-# Kafka Topics
+# Kafka Topics and Consumer Config
 kafka:
   topics:
     payment-events: payment-events
     order-events: order-events
     refund-events: refund-events
+  consumer:
+    group-id: payment-service-group
 
 # Actuator Configuration
 management:

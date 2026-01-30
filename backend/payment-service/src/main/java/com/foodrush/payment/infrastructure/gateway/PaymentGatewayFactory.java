@@ -2,7 +2,6 @@ package com.foodrush.payment.infrastructure.gateway;
 
 import com.foodrush.payment.domain.model.PaymentProvider;
 import com.foodrush.payment.domain.repository.PaymentGateway;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +28,6 @@ import java.util.stream.Collectors;
  * </p>
  */
 @Component
-@RequiredArgsConstructor
 @Slf4j
 public class PaymentGatewayFactory {
 

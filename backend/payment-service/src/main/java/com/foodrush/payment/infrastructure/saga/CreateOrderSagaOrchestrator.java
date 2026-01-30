@@ -2,6 +2,7 @@ package com.foodrush.payment.infrastructure.saga;
 
 import com.foodrush.payment.domain.saga.CreateOrderSagaContext;
 import com.foodrush.payment.domain.saga.SagaStep;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -35,11 +36,10 @@ public class CreateOrderSagaOrchestrator {
     private final List<SagaStep<CreateOrderSagaContext>> steps;
 
     /**
-     * Constructor que recibe todos los pasos del SAGA.
-     * Spring inyecta automáticamente todas las implementaciones de SagaStep.
+     * Log de inicialización después de la construcción.
      */
-    public CreateOrderSagaOrchestrator(List<SagaStep<CreateOrderSagaContext>> steps) {
-        this.steps = steps;
+    @PostConstruct
+    public void init() {
         log.info("CreateOrderSagaOrchestrator inicializado con {} pasos: {}",
                 steps.size(),
                 steps.stream().map(SagaStep::getName).toList());

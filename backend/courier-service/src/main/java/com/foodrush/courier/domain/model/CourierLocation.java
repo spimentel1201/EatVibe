@@ -45,14 +45,14 @@ public class CourierLocation {
      * Latitud en formato decimal (-90 a 90)
      * Almacenado separadamente para fácil acceso
      */
-    @Column(nullable = false, precision = 10, scale = 8)
+    @Column(nullable = false)
     private Double latitude;
 
     /**
      * Longitud en formato decimal (-180 a 180)
      * Almacenado separadamente para fácil acceso
      */
-    @Column(nullable = false, precision = 11, scale = 8)
+    @Column(nullable = false)
     private Double longitude;
 
     /**
@@ -65,13 +65,13 @@ public class CourierLocation {
     /**
      * Precisión del GPS en metros
      */
-    @Column(precision = 10, scale = 2)
+    @Column
     private Double accuracy;
 
     /**
      * Velocidad en km/h
      */
-    @Column(precision = 10, scale = 2)
+    @Column
     private Double speed;
 
     // ============================================

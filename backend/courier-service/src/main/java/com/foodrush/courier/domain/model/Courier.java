@@ -47,7 +47,7 @@ public class Courier {
     @Builder.Default
     private CourierStatus status = CourierStatus.OFFLINE;
 
-    @Column(nullable = false, precision = 3, scale = 2)
+    @Column(nullable = false)
     @Builder.Default
     private Double rating = 5.0;
 

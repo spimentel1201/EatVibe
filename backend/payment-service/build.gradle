@@ -15,6 +15,9 @@ dependencies {
     runtimeOnly 'org.postgresql:postgresql'
     implementation 'org.flywaydb:flyway-core'
     
+    // Environment Variables (.env support)
+    implementation 'me.paulschwarz:spring-dotenv:4.0.0'
+    
     // Stripe SDK
     implementation 'com.stripe:stripe-java:24.3.0'
     

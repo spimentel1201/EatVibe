@@ -8,6 +8,8 @@ import com.foodrush.courier.domain.model.CourierLocation;
 import com.foodrush.courier.domain.repository.CourierLocationRepository;
 import com.foodrush.courier.domain.repository.CourierRepository;
 import com.foodrush.courier.domain.service.GeolocationService;
+import com.foodrush.courier.infrastructure.messaging.event.CourierLocationUpdatedEvent;
+import com.foodrush.courier.infrastructure.messaging.publisher.LocationEventPublisher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Point;
@@ -24,7 +26,7 @@ import java.util.UUID;
  * - Valida coordenadas
  * - Crea punto PostGIS
  * - Guarda ubicación en base de datos
- * - Publica evento a Kafka (futuro)
+ * - Publica evento a Kafka
  * - Broadcast vía WebSocket (futuro)
  */
 @Service
@@ -32,59 +34,71 @@ import java.util.UUID;
 @Slf4j
 public class UpdateCourierLocationUseCase {
 
-    private final CourierRepository courierRepository;
-    private final CourierLocationRepository locationRepository;
-    private final GeolocationService geolocationService;
+        private final CourierRepository courierRepository;
+        private final CourierLocationRepository locationRepository;
+        private final GeolocationService geolocationService;
+        private final LocationEventPublisher locationEventPublisher;
 
-    /**
-     * Actualiza la ubicación del courier
-     * 
-     * @param courierId ID del courier
-     * @param request   Datos de ubicación
-     * @return Respuesta con la ubicación guardada
-     */
-    @Transactional
-    public LocationResponse execute(UUID courierId, LocationUpdateRequest request) {
-        log.debug("Updating location for courier: {}", courierId);
+        /**
+         * Actualiza la ubicación del courier
+         * 
+         * @param courierId ID del courier
+         * @param request   Datos de ubicación
+         * @return Respuesta con la ubicación guardada
+         */
+        @Transactional
+        public LocationResponse execute(UUID courierId, LocationUpdateRequest request) {
+                log.debug("Updating location for courier: {}", courierId);
 
-        // 1. Buscar courier
-        Courier courier = courierRepository.findById(courierId)
-                .orElseThrow(() -> new CourierNotFoundException(courierId));
+                // 1. Buscar courier
+                Courier courier = courierRepository.findById(courierId)
+                                .orElseThrow(() -> new CourierNotFoundException(courierId));
 
-        // 2. Validar y crear punto PostGIS
-        Point location = geolocationService.createPoint(
-                request.getLatitude(),
-                request.getLongitude());
+                // 2. Validar y crear punto PostGIS
+                Point location = geolocationService.createPoint(
+                                request.getLatitude(),
+                                request.getLongitude());
 
-        // 3. Crear entidad CourierLocation
-        CourierLocation courierLocation = CourierLocation.builder()
-                .courier(courier)
-                .location(location)
-                .latitude(request.getLatitude())
-                .longitude(request.getLongitude())
-                .timestamp(LocalDateTime.now())
-                .accuracy(request.getAccuracy())
-                .speed(request.getSpeed())
-                .build();
+                // 3. Crear entidad CourierLocation
+                CourierLocation courierLocation = CourierLocation.builder()
+                                .courier(courier)
+                                .location(location)
+                                .latitude(request.getLatitude())
+                                .longitude(request.getLongitude())
+                                .timestamp(LocalDateTime.now())
+                                .accuracy(request.getAccuracy())
+                                .speed(request.getSpeed())
+                                .build();
 
-        // 4. Guardar en base de datos
-        CourierLocation saved = locationRepository.save(courierLocation);
+                // 4. Guardar en base de datos
+                CourierLocation saved = locationRepository.save(courierLocation);
 
-        log.info("Location updated for courier {}: ({}, {})",
-                courierId, request.getLatitude(), request.getLongitude());
+                log.info("Location updated for courier {}: ({}, {})",
+                                courierId, request.getLatitude(), request.getLongitude());
 
-        // 5. TODO: Publicar evento a Kafka
-        // 6. TODO: Broadcast vía WebSocket
+                // 5. Publicar evento a Kafka
+                CourierLocationUpdatedEvent event = CourierLocationUpdatedEvent.builder()
+                                .courierId(courier.getId())
+                                .latitude(saved.getLatitude())
+                                .longitude(saved.getLongitude())
+                                .accuracy(saved.getAccuracy())
+                                .speed(saved.getSpeed())
+                                .timestamp(saved.getTimestamp())
+                                .build();
 
-        // 7. Retornar respuesta
-        return LocationResponse.builder()
-                .id(saved.getId())
-                .courierId(courier.getId())
-                .latitude(saved.getLatitude())
-                .longitude(saved.getLongitude())
-                .timestamp(saved.getTimestamp())
-                .accuracy(saved.getAccuracy())
-                .speed(saved.getSpeed())
-                .build();
-    }
+                locationEventPublisher.publishLocationUpdate(event);
+
+                // 6. TODO: Broadcast vía WebSocket (Sprint 4.7)
+
+                // 7. Retornar respuesta
+                return LocationResponse.builder()
+                                .id(saved.getId())
+                                .courierId(courier.getId())
+                                .latitude(saved.getLatitude())
+                                .longitude(saved.getLongitude())
+                                .timestamp(saved.getTimestamp())
+                                .accuracy(saved.getAccuracy())
+                                .speed(saved.getSpeed())
+                                .build();
+        }
 }

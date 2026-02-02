@@ -1,0 +1,156 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgis/postgis:15-3.3-alpine
+    container_name: foodrush-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - foodrush-network
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: foodrush-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - foodrush-network
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: foodrush-kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - foodrush-network
+
+  auth-service:
+    build:
+      context: ./backend
+      dockerfile: auth-service/Dockerfile
+    container_name: foodrush-auth
+    ports:
+      - "8088:8088"
+    environment:
+      SERVER_PORT: 8088
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: auth_db
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+    depends_on:
+      - postgres
+    networks:
+      - foodrush-network
+
+  api-gateway:
+    build:
+      context: ./backend
+      dockerfile: api-gateway/Dockerfile
+    container_name: foodrush-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      SERVER_PORT: 8080
+      # Override routes URI to use docker service names
+      SPRING_CLOUD_GATEWAY_ROUTES_0_URI: http://auth-service:8088
+      SPRING_CLOUD_GATEWAY_ROUTES_1_URI: http://restaurant-service:8082
+      SPRING_CLOUD_GATEWAY_ROUTES_2_URI: http://order-service:8081
+      SPRING_CLOUD_GATEWAY_ROUTES_3_URI: http://courier-service:8086
+      SPRING_CLOUD_GATEWAY_ROUTES_4_URI: http://payment-service:8085
+    depends_on:
+      - auth-service
+    networks:
+      - foodrush-network
+
+  restaurant-service:
+    build:
+      context: ./backend
+      dockerfile: restaurant-service/Dockerfile
+    container_name: foodrush-restaurant
+    ports:
+      - "8082:8082"
+    environment:
+      SERVER_PORT: 8082
+      DB_HOST: postgres
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+    depends_on:
+      - postgres
+      - kafka
+    networks:
+      - foodrush-network
+
+  order-service:
+    build:
+      context: ./backend
+      dockerfile: order-service/Dockerfile
+    container_name: foodrush-order
+    ports:
+      - "8081:8081"
+    environment:
+      SERVER_PORT: 8081
+      DB_HOST: postgres
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+    depends_on:
+      - postgres
+      - kafka
+    networks:
+      - foodrush-network
+
+  courier-service:
+    build:
+      context: ./backend
+      dockerfile: courier-service/Dockerfile
+    container_name: foodrush-courier
+    ports:
+      - "8086:8086"
+    environment:
+      SERVER_PORT: 8086
+      DB_HOST: postgres
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+    depends_on:
+      - postgres
+      - kafka
+    networks:
+      - foodrush-network
+
+  payment-service:
+    build:
+      context: ./backend
+      dockerfile: payment-service/Dockerfile
+    container_name: foodrush-payment
+    ports:
+      - "8085:8085"
+    environment:
+      SERVER_PORT: 8085
+      DB_HOST: postgres
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+    depends_on:
+      - postgres
+      - kafka
+    networks:
+      - foodrush-network
+
+networks:
+  foodrush-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

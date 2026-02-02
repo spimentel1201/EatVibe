@@ -59,6 +59,10 @@ kafka:
     location-updates: ${KAFKA_TOPIC_LOCATION_UPDATES:location-updates}
     order-events: ${KAFKA_TOPIC_ORDER_EVENTS:order-events}
 
+# Security
+jwt:
+  secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+
 # Logging
 logging:
   level:

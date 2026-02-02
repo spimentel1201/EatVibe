@@ -17,32 +17,56 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class WebSocketAuthInterceptor implements ChannelInterceptor {
 
+    @org.springframework.beans.factory.annotation.Value("${jwt.secret}")
+    private String secretKey;
+
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
 
         if (accessor != null && StompCommand.CONNECT.equals(accessor.getCommand())) {
-            // Extraer token del header Authorization
             String authHeader = accessor.getFirstNativeHeader("Authorization");
 
             if (authHeader != null && authHeader.startsWith("Bearer ")) {
                 String token = authHeader.substring(7);
-                log.debug("WebSocket connection attempt with token: {}...",
-                        token.substring(0, Math.min(10, token.length())));
+                try {
+                    // Validar Token
+                    io.jsonwebtoken.Claims claims = io.jsonwebtoken.Jwts.parserBuilder()
+                            .setSigningKey(getSignKey())
+                            .build()
+                            .parseClaimsJws(token)
+                            .getBody();
 
-                // TODO: Validar token JWT y establecer autenticación en el contexto.
-                // Pendiente: Agregar spring-boot-starter-security y librería JWT (jjwt/auth0).
-                // Pendiente: Configurar JWT_SECRET en application.yml.
-                // Por ahora permitimos la conexión para pruebas de desarrollo.
+                    String userId = claims.get("userId", String.class);
+                    String role = claims.get("role", String.class);
+                    String email = claims.getSubject();
 
+                    log.info("WebSocket Authenticated: User={}, Role={}", email, role);
+
+                    // Establecer usuario en la sesión WebSocket
+                    // Usamos un Principal simple ya que no tenemos Spring Security full context
+                    // aquí
+                    accessor.setUser(new java.security.Principal() {
+                        @Override
+                        public String getName() {
+                            return userId != null ? userId : email;
+                        }
+                    });
+
+                } catch (Exception e) {
+                    log.error("WebSocket Authentication Failed: {}", e.getMessage());
+                    throw new IllegalArgumentException("Invalid JWT Token");
+                }
             } else {
                 log.warn("WebSocket connection attempt without valid Authorization header");
-                // TODO: Descomentar para forzar autenticación
-                // throw new IllegalArgumentException("Missing or invalid Authorization
-                // header");
+                throw new IllegalArgumentException("Missing or invalid Authorization header");
             }
         }
-
         return message;
+    }
+
+    private java.security.Key getSignKey() {
+        byte[] keyBytes = io.jsonwebtoken.io.Decoders.BASE64.decode(secretKey);
+        return io.jsonwebtoken.security.Keys.hmacShaKeyFor(keyBytes);
     }
 }

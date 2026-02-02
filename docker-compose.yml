@@ -43,8 +43,8 @@ services:
 
   auth-service:
     build:
-      context: ./backend
-      dockerfile: auth-service/Dockerfile
+      context: ./backend/auth-service
+      dockerfile: Dockerfile
     container_name: foodrush-auth
     ports:
       - "8088:8088"
@@ -62,8 +62,8 @@ services:
 
   api-gateway:
     build:
-      context: ./backend
-      dockerfile: api-gateway/Dockerfile
+      context: ./backend/api-gateway
+      dockerfile: Dockerfile
     container_name: foodrush-gateway
     ports:
       - "8080:8080"
@@ -82,8 +82,8 @@ services:
 
   restaurant-service:
     build:
-      context: ./backend
-      dockerfile: restaurant-service/Dockerfile
+      context: ./backend/restaurant-service
+      dockerfile: Dockerfile
     container_name: foodrush-restaurant
     ports:
       - "8082:8082"
@@ -99,8 +99,8 @@ services:
 
   order-service:
     build:
-      context: ./backend
-      dockerfile: order-service/Dockerfile
+      context: ./backend/order-service
+      dockerfile: Dockerfile
     container_name: foodrush-order
     ports:
       - "8081:8081"
@@ -116,8 +116,8 @@ services:
 
   courier-service:
     build:
-      context: ./backend
-      dockerfile: courier-service/Dockerfile
+      context: ./backend/courier-service
+      dockerfile: Dockerfile
     container_name: foodrush-courier
     ports:
       - "8086:8086"
@@ -133,8 +133,8 @@ services:
 
   payment-service:
     build:
-      context: ./backend
-      dockerfile: payment-service/Dockerfile
+      context: ./backend/payment-service
+      dockerfile: Dockerfile
     container_name: foodrush-payment
     ports:
       - "8085:8085"

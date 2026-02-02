@@ -7,9 +7,11 @@ import com.foodrush.courier.domain.model.Courier;
 import com.foodrush.courier.domain.model.CourierLocation;
 import com.foodrush.courier.domain.repository.CourierLocationRepository;
 import com.foodrush.courier.domain.repository.CourierRepository;
+import com.foodrush.courier.domain.repository.DeliveryRepository;
 import com.foodrush.courier.domain.service.GeolocationService;
 import com.foodrush.courier.infrastructure.messaging.event.CourierLocationUpdatedEvent;
 import com.foodrush.courier.infrastructure.messaging.publisher.LocationEventPublisher;
+import com.foodrush.courier.infrastructure.messaging.websocket.WebSocketNotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Point;
@@ -27,7 +29,7 @@ import java.util.UUID;
  * - Crea punto PostGIS
  * - Guarda ubicación en base de datos
  * - Publica evento a Kafka
- * - Broadcast vía WebSocket (futuro)
+ * - Broadcast vía WebSocket
  */
 @Service
 @RequiredArgsConstructor
@@ -36,8 +38,10 @@ public class UpdateCourierLocationUseCase {
 
         private final CourierRepository courierRepository;
         private final CourierLocationRepository locationRepository;
+        private final DeliveryRepository deliveryRepository;
         private final GeolocationService geolocationService;
         private final LocationEventPublisher locationEventPublisher;
+        private final WebSocketNotificationService webSocketNotificationService;
 
         /**
          * Actualiza la ubicación del courier
@@ -88,10 +92,8 @@ public class UpdateCourierLocationUseCase {
 
                 locationEventPublisher.publishLocationUpdate(event);
 
-                // 6. TODO: Broadcast vía WebSocket (Sprint 4.7)
-
-                // 7. Retornar respuesta
-                return LocationResponse.builder()
+                // 6. Broadcast vía WebSocket si hay entrega activa
+                LocationResponse response = LocationResponse.builder()
                                 .id(saved.getId())
                                 .courierId(courier.getId())
                                 .latitude(saved.getLatitude())
@@ -100,5 +102,15 @@ public class UpdateCourierLocationUseCase {
                                 .accuracy(saved.getAccuracy())
                                 .speed(saved.getSpeed())
                                 .build();
+
+                // Buscar entregas activas para notificar al cliente correspondiente
+                var activeDeliveries = deliveryRepository.findActiveByCourier(courier);
+                for (var delivery : activeDeliveries) {
+                        webSocketNotificationService.convertAndSendOrderingTrackingUpdate(delivery.getOrderId(),
+                                        response);
+                }
+
+                // 7. Retornar respuesta
+                return response;
         }
 }

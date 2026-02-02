@@ -15,10 +15,10 @@ import java.util.UUID;
 @Repository
 public interface CourierShiftJpaRepository extends JpaRepository<CourierShift, UUID> {
 
-    @Query("SELECT s FROM CourierShift s WHERE s.courier = :courier AND s.endTime IS NULL")
+    @Query("SELECT s FROM CourierShift s WHERE s.courier = :courier AND s.clockOutAt IS NULL")
     Optional<CourierShift> findActiveShiftByCourier(@Param("courier") Courier courier);
 
-    @Query("SELECT s FROM CourierShift s WHERE s.courier = :courier AND s.endTime IS NOT NULL AND s.startTime BETWEEN :start AND :end")
+    @Query("SELECT s FROM CourierShift s WHERE s.courier = :courier AND s.clockOutAt IS NOT NULL AND s.clockInAt BETWEEN :start AND :end")
     List<CourierShift> findCompletedShiftsByCourierAndDateRange(
             @Param("courier") Courier courier,
             @Param("start") LocalDateTime start,

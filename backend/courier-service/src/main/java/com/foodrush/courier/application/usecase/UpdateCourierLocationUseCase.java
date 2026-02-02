@@ -5,6 +5,7 @@ import com.foodrush.courier.application.dto.response.LocationResponse;
 import com.foodrush.courier.domain.exception.CourierNotFoundException;
 import com.foodrush.courier.domain.model.Courier;
 import com.foodrush.courier.domain.model.CourierLocation;
+import com.foodrush.courier.domain.model.Delivery;
 import com.foodrush.courier.domain.repository.CourierLocationRepository;
 import com.foodrush.courier.domain.repository.CourierRepository;
 import com.foodrush.courier.domain.repository.DeliveryRepository;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -104,8 +106,8 @@ public class UpdateCourierLocationUseCase {
                                 .build();
 
                 // Buscar entregas activas para notificar al cliente correspondiente
-                var activeDeliveries = deliveryRepository.findActiveByCourier(courier);
-                for (var delivery : activeDeliveries) {
+                List<Delivery> activeDeliveries = deliveryRepository.findActiveByCourier(courier);
+                for (Delivery delivery : activeDeliveries) {
                         webSocketNotificationService.convertAndSendOrderingTrackingUpdate(delivery.getOrderId(),
                                         response);
                 }

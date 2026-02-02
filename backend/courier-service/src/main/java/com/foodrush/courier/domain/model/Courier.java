@@ -29,8 +29,15 @@ public class Courier {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false)
-    private String name;
+    @Column(nullable = false, name = "first_name")
+    private String firstName;
+
+    @Column(nullable = false, name = "last_name")
+    private String lastName;
+
+    public String getFullName() {
+        return firstName + " " + lastName;
+    }
 
     @Column(nullable = false, unique = true, length = 20)
     private String phone;

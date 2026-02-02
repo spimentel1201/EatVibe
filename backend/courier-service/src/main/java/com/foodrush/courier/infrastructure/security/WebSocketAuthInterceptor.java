@@ -30,9 +30,10 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
                 log.debug("WebSocket connection attempt with token: {}...",
                         token.substring(0, Math.min(10, token.length())));
 
-                // TODO: Validar token JWT y establecer autenticación en el contexto
-                // UsernamePasswordAuthenticationToken user = ...
-                // accessor.setUser(user);
+                // TODO: Validar token JWT y establecer autenticación en el contexto.
+                // Pendiente: Agregar spring-boot-starter-security y librería JWT (jjwt/auth0).
+                // Pendiente: Configurar JWT_SECRET en application.yml.
+                // Por ahora permitimos la conexión para pruebas de desarrollo.
 
             } else {
                 log.warn("WebSocket connection attempt without valid Authorization header");

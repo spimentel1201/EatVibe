@@ -80,7 +80,9 @@ public class CreateDeliveryUseCase {
                 .id(delivery.getId())
                 .orderId(delivery.getOrderId())
                 .courierId(delivery.getCourier() != null ? delivery.getCourier().getId() : null)
-                .courierName(delivery.getCourier() != null ? delivery.getCourier().getName() : null)
+                .courierName(delivery.getCourier() != null
+                        ? delivery.getCourier().getFirstName() + " " + delivery.getCourier().getLastName()
+                        : null)
                 .status(delivery.getStatus())
                 .pickupLatitude(delivery.getPickupLocation().getY())
                 .pickupLongitude(delivery.getPickupLocation().getX())

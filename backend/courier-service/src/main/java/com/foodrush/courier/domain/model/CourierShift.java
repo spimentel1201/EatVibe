@@ -52,6 +52,10 @@ public class CourierShift {
     @Builder.Default
     private Integer totalDeliveries = 0;
 
+    @Column(name = "total_distance_km")
+    @Builder.Default
+    private Double totalDistanceKm = 0.0;
+
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -70,12 +74,27 @@ public class CourierShift {
     }
 
     /**
+     * Incrementa conteo de entregas
+     */
+    public void incrementDeliveries() {
+        this.totalDeliveries++;
+    }
+
+    /**
+     * Agrega distancia recorrida
+     */
+    public void addDistance(Double km) {
+        if (km != null && km > 0) {
+            this.totalDistanceKm += km;
+        }
+    }
+
+    /**
      * Agrega ganancias de una entrega
      */
     public void addEarnings(BigDecimal earnings) {
         if (earnings != null && earnings.compareTo(BigDecimal.ZERO) > 0) {
             this.totalEarnings = this.totalEarnings.add(earnings);
-            this.totalDeliveries++;
         }
     }
 

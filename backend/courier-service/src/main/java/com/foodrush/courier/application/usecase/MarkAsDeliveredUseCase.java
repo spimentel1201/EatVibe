@@ -2,15 +2,19 @@ package com.foodrush.courier.application.usecase;
 
 import com.foodrush.courier.domain.exception.DeliveryNotFoundException;
 import com.foodrush.courier.domain.model.CourierLocation;
+import com.foodrush.courier.domain.model.CourierShift;
 import com.foodrush.courier.domain.model.Delivery;
 import com.foodrush.courier.domain.repository.CourierLocationRepository;
+import com.foodrush.courier.domain.repository.CourierShiftRepository;
 import com.foodrush.courier.domain.repository.DeliveryRepository;
+import com.foodrush.courier.domain.service.EarningsService;
 import com.foodrush.courier.domain.service.GeofencingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 /**
@@ -20,6 +24,11 @@ import java.util.UUID;
  * 1. PIN de entrega
  * 2. Ubicación del courier (geofencing)
  * 3. Estado de la entrega
+ * 
+ * Acciones:
+ * - Calcula ganancias
+ * - Actualiza turno
+ * - Finaliza entrega
  */
 @Service
 @RequiredArgsConstructor
@@ -28,7 +37,9 @@ public class MarkAsDeliveredUseCase {
 
     private final DeliveryRepository deliveryRepository;
     private final CourierLocationRepository locationRepository;
+    private final CourierShiftRepository shiftRepository;
     private final GeofencingService geofencingService;
+    private final EarningsService earningsService;
 
     @Transactional
     public void execute(UUID deliveryId, String pin) {
@@ -60,18 +71,31 @@ public class MarkAsDeliveredUseCase {
             throw new IllegalArgumentException("Invalid delivery PIN");
         }
 
-        // 6. Actualizar courier (completa delivery, actualiza rating si aplica)
+        // 6. Calcular ganancias
+        BigDecimal earnings = earningsService.calculateDeliveryEarnings(
+                delivery.getDistance().doubleValue(),
+                delivery.getCourier().getVehicleType());
+        delivery.setEarnings(earnings);
+
+        // 7. Actualizar courier y turno
         if (delivery.getCourier() != null) {
             delivery.getCourier().completeDelivery(null); // Rating se actualizará después
+
+            // Actualizar turno activo
+            shiftRepository.findActiveShiftByCourier(delivery.getCourier())
+                    .ifPresent(shift -> {
+                        shift.addEarnings(earnings);
+                        shift.addDistance(delivery.getDistance().doubleValue());
+                        shift.incrementDeliveries();
+                        shiftRepository.save(shift);
+                    });
         }
 
-        // 7. Guardar
+        // 8. Guardar delivery
         deliveryRepository.save(delivery);
 
-        log.info("Delivery {} marked as delivered by courier {}",
-                deliveryId, delivery.getCourier().getId());
+        log.info("Delivery {} completed. Earnings: {}", deliveryId, earnings);
 
-        // 8. TODO: Publicar evento DeliveryCompletedEvent
-        // 9. TODO: Calcular earnings del courier
+        // 9. TODO: Publicar evento DeliveryCompletedEvent
     }
 }

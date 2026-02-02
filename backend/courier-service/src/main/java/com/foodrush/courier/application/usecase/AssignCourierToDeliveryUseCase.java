@@ -2,6 +2,7 @@ package com.foodrush.courier.application.usecase;
 
 import com.foodrush.courier.domain.exception.CourierNotFoundException;
 import com.foodrush.courier.domain.exception.DeliveryNotFoundException;
+import com.foodrush.courier.domain.messaging.DeliveryEventPublisher;
 import com.foodrush.courier.domain.model.Courier;
 import com.foodrush.courier.domain.model.CourierLocation;
 import com.foodrush.courier.domain.model.Delivery;
@@ -31,7 +32,7 @@ import java.util.UUID;
  * 4. Aplicar algoritmo de scoring
  * 5. Asignar mejor courier
  * 6. Actualizar estados
- * 7. Publicar evento (futuro)
+ * 7. Publicar evento
  */
 @Service
 @RequiredArgsConstructor
@@ -43,6 +44,7 @@ public class AssignCourierToDeliveryUseCase {
     private final CourierLocationRepository locationRepository;
     private final CourierAssignmentService assignmentService;
     private final GeolocationService geolocationService;
+    private final DeliveryEventPublisher eventPublisher;
 
     @Value("${geolocation.max-assignment-radius-km}")
     private double maxAssignmentRadiusKm;
@@ -148,7 +150,9 @@ public class AssignCourierToDeliveryUseCase {
         log.info("Successfully assigned courier {} to delivery {}",
                 bestCourier.getId(), deliveryId);
 
-        // 7. TODO: Publicar evento DeliveryAssignedEvent
+        // 7. Publicar evento DeliveryAssignedEvent
+        eventPublisher.publishDeliveryAssigned(delivery);
+        log.info("Published DELIVERY_ASSIGNED event for delivery {}", delivery.getId());
 
         return bestCourier.getId();
     }

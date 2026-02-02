@@ -9,6 +9,7 @@ import com.foodrush.courier.domain.repository.CourierShiftRepository;
 import com.foodrush.courier.domain.repository.DeliveryRepository;
 import com.foodrush.courier.domain.service.EarningsService;
 import com.foodrush.courier.domain.service.GeofencingService;
+import com.foodrush.courier.domain.messaging.DeliveryEventPublisher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -40,6 +41,7 @@ public class MarkAsDeliveredUseCase {
     private final CourierShiftRepository shiftRepository;
     private final GeofencingService geofencingService;
     private final EarningsService earningsService;
+    private final DeliveryEventPublisher eventPublisher;
 
     @Transactional
     public void execute(UUID deliveryId, String pin) {
@@ -96,6 +98,7 @@ public class MarkAsDeliveredUseCase {
 
         log.info("Delivery {} completed. Earnings: {}", deliveryId, earnings);
 
-        // 9. TODO: Publicar evento DeliveryCompletedEvent
+        // 9. Publicar evento DeliveryCompletedEvent
+        eventPublisher.publishDeliveryCompleted(delivery);
     }
 }

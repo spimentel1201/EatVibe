@@ -156,14 +156,6 @@ npm test
 - Componentes funcionales con Hooks
 - CSS Modules o TailwindCSS
 
-## 📄 Licencia
-
-[Especificar licencia]
-
-## 👥 Equipo
-
-[Información del equipo]
-
 ---
 
 **Versión:** 1.0.0  

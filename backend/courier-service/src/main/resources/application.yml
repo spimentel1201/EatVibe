@@ -6,7 +6,7 @@ spring:
     name: courier-service
   
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/courier_db}
+    url: jdbc:postgresql://${DB_HOST:localhost}:5432/courier_db
     username: ${DB_USERNAME:foodrush}
     password: ${DB_PASSWORD:foodrush_dev_2026}
     driver-class-name: org.postgresql.Driver
@@ -58,6 +58,10 @@ kafka:
     delivery-events: ${KAFKA_TOPIC_DELIVERY_EVENTS:delivery-events}
     location-updates: ${KAFKA_TOPIC_LOCATION_UPDATES:location-updates}
     order-events: ${KAFKA_TOPIC_ORDER_EVENTS:order-events}
+
+# Security
+jwt:
+  secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
 
 # Logging
 logging:

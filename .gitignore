@@ -184,6 +184,7 @@ docker-compose.override.yml
 *.swp
 *.swo
 *~
+*.txt
 
 # Package files
 *.jar

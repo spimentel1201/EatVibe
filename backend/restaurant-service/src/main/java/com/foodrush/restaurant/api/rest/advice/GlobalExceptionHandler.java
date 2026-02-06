@@ -5,12 +5,11 @@ import com.foodrush.restaurant.domain.exception.DuplicateRestaurantNameException
 import com.foodrush.restaurant.domain.exception.RestaurantNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ProblemDetail;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.net.URI;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,91 +19,60 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(RestaurantNotFoundException.class)
-    public ProblemDetail handleRestaurantNotFound(RestaurantNotFoundException ex) {
+    public ResponseEntity<ErrorResponse> handleRestaurantNotFound(RestaurantNotFoundException ex) {
         log.error("Restaurant not found: {}", ex.getMessage());
 
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
-                HttpStatus.NOT_FOUND,
-                ex.getMessage());
-        problemDetail.setTitle("Restaurante no encontrado");
-        problemDetail.setType(URI.create("https://foodrush.com/errors/restaurant-not-found"));
-        problemDetail.setProperty("timestamp", Instant.now());
-
-        return problemDetail;
+        return buildResponse(HttpStatus.NOT_FOUND, "RESTAURANT_NOT_FOUND", ex.getMessage(), null);
     }
 
     @ExceptionHandler(CategoryNotFoundException.class)
-    public ProblemDetail handleCategoryNotFound(CategoryNotFoundException ex) {
+    public ResponseEntity<ErrorResponse> handleCategoryNotFound(CategoryNotFoundException ex) {
         log.error("Category not found: {}", ex.getMessage());
 
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
-                HttpStatus.NOT_FOUND,
-                ex.getMessage());
-        problemDetail.setTitle("Categoría no encontrada");
-        problemDetail.setType(URI.create("https://foodrush.com/errors/category-not-found"));
-        problemDetail.setProperty("timestamp", Instant.now());
-
-        return problemDetail;
+        return buildResponse(HttpStatus.NOT_FOUND, "CATEGORY_NOT_FOUND", ex.getMessage(), null);
     }
 
     @ExceptionHandler(DuplicateRestaurantNameException.class)
-    public ProblemDetail handleDuplicateRestaurantName(DuplicateRestaurantNameException ex) {
+    public ResponseEntity<ErrorResponse> handleDuplicateRestaurantName(DuplicateRestaurantNameException ex) {
         log.error("Duplicate restaurant name: {}", ex.getMessage());
 
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
-                HttpStatus.CONFLICT,
-                ex.getMessage());
-        problemDetail.setTitle("Nombre de restaurante duplicado");
-        problemDetail.setType(URI.create("https://foodrush.com/errors/duplicate-restaurant-name"));
-        problemDetail.setProperty("timestamp", Instant.now());
-
-        return problemDetail;
+        return buildResponse(HttpStatus.CONFLICT, "DUPLICATE_RESTAURANT_NAME", ex.getMessage(), null);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ProblemDetail handleValidationErrors(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ErrorResponse> handleValidationErrors(MethodArgumentNotValidException ex) {
         log.error("Validation error: {}", ex.getMessage());
 
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getFieldErrors()
                 .forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
 
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
-                HttpStatus.BAD_REQUEST,
-                "Error de validación en los datos de entrada");
-        problemDetail.setTitle("Datos inválidos");
-        problemDetail.setType(URI.create("https://foodrush.com/errors/validation-error"));
-        problemDetail.setProperty("timestamp", Instant.now());
-        problemDetail.setProperty("errors", errors);
-
-        return problemDetail;
+        return buildResponse(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "Error de validación en los datos de entrada",
+                errors);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ProblemDetail handleIllegalArgument(IllegalArgumentException ex) {
+    public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException ex) {
         log.error("Illegal argument: {}", ex.getMessage());
 
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
-                HttpStatus.BAD_REQUEST,
-                ex.getMessage());
-        problemDetail.setTitle("Argumento inválido");
-        problemDetail.setType(URI.create("https://foodrush.com/errors/illegal-argument"));
-        problemDetail.setProperty("timestamp", Instant.now());
-
-        return problemDetail;
+        return buildResponse(HttpStatus.BAD_REQUEST, "INVALID_ARGUMENT", ex.getMessage(), null);
     }
 
     @ExceptionHandler(Exception.class)
-    public ProblemDetail handleGenericException(Exception ex) {
+    public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
         log.error("Unexpected error: ", ex);
 
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                "Ha ocurrido un error inesperado en el servidor");
-        problemDetail.setTitle("Error interno del servidor");
-        problemDetail.setType(URI.create("https://foodrush.com/errors/internal-server-error"));
-        problemDetail.setProperty("timestamp", Instant.now());
+        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_SERVER_ERROR",
+                "Ha ocurrido un error inesperado en el servidor", null);
+    }
 
-        return problemDetail;
+    private ResponseEntity<ErrorResponse> buildResponse(HttpStatus status, String code, String message,
+            Object details) {
+        return ResponseEntity.status(status).body(ErrorResponse.builder()
+                .code(code)
+                .message(message)
+                .details(details)
+                .timestamp(Instant.now())
+                .build());
     }
 }

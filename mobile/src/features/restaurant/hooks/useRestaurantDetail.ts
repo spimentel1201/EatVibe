@@ -1,6 +1,6 @@
-import { useQuery, UseQueryResult } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
+
 import * as restaurantApi from '../api/restaurantApi';
-import { MenuItem, Restaurant } from '../types';
 
 /**
  * Hook to fetch restaurant details and menu

@@ -1,13 +1,11 @@
-import { useQuery, UseQueryResult } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import * as restaurantApi from '../api/restaurantApi';
 import { Restaurant, RestaurantSearchParams } from '../types';
 
 /**
  * Hook to fetch restaurants by location
  */
-export const useRestaurants = (
-    params: RestaurantSearchParams
-): UseQueryResult<Restaurant[], Error> => {
+export const useRestaurants = (params: RestaurantSearchParams) => {
     return useQuery({
         queryKey: ['restaurants', params],
         queryFn: () => restaurantApi.getRestaurants(params),
@@ -20,7 +18,7 @@ export const useRestaurants = (
 /**
  * Hook to fetch a single restaurant by ID
  */
-export const useRestaurant = (id: string): UseQueryResult<Restaurant | null, Error> => {
+export const useRestaurant = (id: string) => {
     return useQuery({
         queryKey: ['restaurant', id],
         queryFn: () => restaurantApi.getRestaurantById(id),
@@ -29,3 +27,4 @@ export const useRestaurant = (id: string): UseQueryResult<Restaurant | null, Err
         enabled: !!id,
     });
 };
+

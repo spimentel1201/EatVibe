@@ -9,6 +9,10 @@
         "src/*"
       ]
     },
+    "typeRoots": [
+      "./node_modules/@types",
+      "./node_modules"
+    ],
     "allowJs": true,
     "noFallthroughCasesInSwitch": true,
     "noUnusedLocals": true,
@@ -19,5 +23,8 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
+  ],
+  "exclude": [
+    "node_modules"
   ]
 }

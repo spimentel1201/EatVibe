@@ -33,12 +33,19 @@ spring:
           filters:
             - AuthenticationFilter
             
+          filters:
+            - AuthenticationFilter
+
         - id: payment-service
           uri: ${PAYMENT_SERVICE_URI:http://localhost:8085}
           predicates:
             - Path=/api/v1/payments/**
           filters:
             - AuthenticationFilter
+            - name: CircuitBreaker
+              args:
+                name: paymentServiceCircuitBreaker
+                fallbackUri: forward:/fallback/payment
 
         - id: storage-service
           uri: ${STORAGE_SERVICE_URI:http://localhost:8089}
@@ -46,7 +53,6 @@ spring:
             - Path=/api/v1/storage/**
           filters:
             - AuthenticationFilter
-
 
       globalcors:
         cors-configurations:
@@ -68,6 +74,20 @@ spring:
 
 jwt:
   secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10000
+        permittedNumberOfCallsInHalfOpenState: 3
+        registerHealthIndicator: true
+    instances:
+      paymentServiceCircuitBreaker:
+        baseConfig: default
 
 logging:
   level:

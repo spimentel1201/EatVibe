@@ -75,6 +75,7 @@ services:
       ORDER_SERVICE_URI: http://order-service:8081
       COURIER_SERVICE_URI: http://courier-service:8086
       PAYMENT_SERVICE_URI: http://payment-service:8085
+      STORAGE_SERVICE_URI: http://storage-service:8089
     depends_on:
       - auth-service
     networks:
@@ -156,9 +157,26 @@ services:
     networks:
       - foodrush-network
 
+  storage-service:
+    build:
+      context: ./backend/storage-service
+      dockerfile: Dockerfile
+    container_name: foodrush-storage
+    ports:
+      - "8089:8089"
+    environment:
+      SERVER_PORT: 8089
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
+    networks:
+      - foodrush-network
+
 networks:
   foodrush-network:
     driver: bridge
 
 volumes:
   postgres_data:
+
+

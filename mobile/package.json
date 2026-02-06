@@ -12,36 +12,37 @@
     "format": "prettier --write \"**/*.{ts,tsx,json,md}\""
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.64.2",
+    "axios": "^1.7.9",
     "expo": "~54.0.33",
+    "expo-constants": "~18.0.13",
+    "expo-linking": "~8.0.11",
+    "expo-location": "~19.0.8",
+    "expo-router": "~6.0.23",
+    "expo-secure-store": "~15.0.8",
     "expo-status-bar": "~3.0.9",
+    "nativewind": "^4.1.23",
     "react": "19.1.0",
     "react-native": "0.81.5",
-    "expo-router": "~6.0.23",
-    "expo-linking": "~8.0.11",
-    "expo-constants": "~18.0.13",
-    "expo-secure-store": "~15.0.8",
-    "expo-location": "~19.0.8",
+    "react-native-maps": "1.20.1",
+    "react-native-mmkv": "^3.1.0",
     "react-native-safe-area-context": "~5.6.0",
     "react-native-screens": "~4.16.0",
-    "nativewind": "^4.1.23",
     "tailwindcss": "^3.4.17",
-    "axios": "^1.7.9",
-    "@tanstack/react-query": "^5.64.2",
-    "zustand": "^5.0.2",
-    "react-native-maps": "1.20.1",
-    "react-native-mmkv": "^3.1.0"
+    "zustand": "^5.0.2"
   },
   "devDependencies": {
-    "@types/react": "~19.1.0",
-    "typescript": "~5.9.2",
     "@babel/core": "^7.26.0",
+    "@types/react": "~19.1.0",
     "@types/react-native": "^0.73.0",
+    "babel-plugin-module-resolver": "^5.0.2",
+    "babel-preset-expo": "^54.0.10",
     "eslint": "^9.18.0",
     "eslint-config-expo": "^10.0.0",
-    "eslint-plugin-prettier": "^5.2.1",
     "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
     "prettier": "^3.4.2",
-    "babel-plugin-module-resolver": "^5.0.2"
+    "typescript": "~5.9.2"
   },
   "private": true
 }

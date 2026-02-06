@@ -1,5 +1,5 @@
-import apiClient from '@/core/api/client';
-import { Restaurant, MenuItem, Category, RestaurantSearchParams } from '../types';
+
+import type { Restaurant, MenuItem, Category, RestaurantSearchParams } from '../types';
 
 // Mock categories
 export const mockCategories: Category[] = [

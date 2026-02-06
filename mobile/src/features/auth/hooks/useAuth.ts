@@ -3,13 +3,11 @@ import { tokenStorage } from '@/core/storage/tokenStorage';
 import * as authApi from '../api/authApi';
 import { User, LoginRequest, RegisterRequest } from '../types';
 
-interface AuthStore {
+export interface AuthStore {
     user: User | null;
     isAuthenticated: boolean;
     isLoading: boolean;
     error: string | null;
-
-    // Actions
     login: (credentials: LoginRequest) => Promise<void>;
     register: (userData: RegisterRequest) => Promise<void>;
     logout: () => Promise<void>;
@@ -17,7 +15,8 @@ interface AuthStore {
     clearError: () => void;
 }
 
-export const useAuth = create<AuthStore>((set, get) => ({
+// MOCK / SIMULATION MODE ENABLED
+export const useAuth = create((set: any): AuthStore => ({
     user: null,
     isAuthenticated: false,
     isLoading: false,
@@ -25,117 +24,78 @@ export const useAuth = create<AuthStore>((set, get) => ({
 
     login: async (credentials: LoginRequest) => {
         set({ isLoading: true, error: null });
-
         try {
-            const response = await authApi.login(credentials);
+            // SIMULACION: Retraso de 1 segundo
+            await new Promise(resolve => setTimeout(resolve, 1000));
 
-            // Save tokens
-            await tokenStorage.saveTokens(response.accessToken, response.refreshToken);
+            // Usuario falso para pruebas
+            const mockUser: User = {
+                id: 'user-123',
+                email: credentials.email,
+                name: 'Usuario Demo',
+                role: 'CONSUMER',
+                phone: '555-0123',
+                createdAt: new Date().toISOString()
+            };
 
             set({
-                user: response.user,
+                user: mockUser,
                 isAuthenticated: true,
-                isLoading: false,
-                error: null,
+                isLoading: false
             });
+            console.log('⚡ SIMULACION: Login exitoso para', credentials.email);
         } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'Error al iniciar sesión';
             set({
-                user: null,
-                isAuthenticated: false,
                 isLoading: false,
-                error: errorMessage,
+                error: 'Error simulado (nunca debería pasar aquí)'
             });
-            throw error;
         }
     },
 
     register: async (userData: RegisterRequest) => {
         set({ isLoading: true, error: null });
-
         try {
-            const response = await authApi.register(userData);
+            await new Promise(resolve => setTimeout(resolve, 1000));
 
-            // Save tokens
-            await tokenStorage.saveTokens(response.accessToken, response.refreshToken);
+            const mockUser: User = {
+                id: 'user-new-123',
+                email: userData.email,
+                name: userData.name,
+                role: 'CONSUMER',
+                phone: userData.phone,
+                createdAt: new Date().toISOString()
+            };
 
             set({
-                user: response.user,
+                user: mockUser,
                 isAuthenticated: true,
-                isLoading: false,
-                error: null,
+                isLoading: false
             });
+            console.log('⚡ SIMULACION: Registro exitoso');
         } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'Error al registrarse';
             set({
-                user: null,
-                isAuthenticated: false,
                 isLoading: false,
-                error: errorMessage,
+                error: 'Error al registrar'
             });
-            throw error;
         }
     },
 
     logout: async () => {
         set({ isLoading: true });
-
         try {
-            await authApi.logout();
-            await tokenStorage.clearTokens();
-
-            set({
-                user: null,
-                isAuthenticated: false,
-                isLoading: false,
-                error: null,
-            });
+            await new Promise(resolve => setTimeout(resolve, 500));
+            set({ user: null, isAuthenticated: false, isLoading: false, error: null });
+            console.log('⚡ SIMULACION: Logout exitoso');
         } catch (error) {
-            console.error('Logout error:', error);
-            // Clear local state even if API call fails
-            await tokenStorage.clearTokens();
-            set({
-                user: null,
-                isAuthenticated: false,
-                isLoading: false,
-                error: null,
-            });
+            set({ isLoading: false });
         }
     },
 
     checkAuth: async () => {
-        set({ isLoading: true });
-
-        try {
-            const accessToken = await tokenStorage.getAccessToken();
-
-            if (!accessToken) {
-                set({ isAuthenticated: false, isLoading: false });
-                return;
-            }
-
-            // Fetch current user
-            const user = await authApi.getCurrentUser();
-
-            set({
-                user,
-                isAuthenticated: true,
-                isLoading: false,
-                error: null,
-            });
-        } catch (error) {
-            console.error('Auth check error:', error);
-            await tokenStorage.clearTokens();
-            set({
-                user: null,
-                isAuthenticated: false,
-                isLoading: false,
-                error: null,
-            });
-        }
+        // En simulacion, arrancamos directo sin esperar
+        set({ user: null, isAuthenticated: false, isLoading: false });
+        console.log('⚡ SIMULACION: CheckAuth inmediato');
     },
 
-    clearError: () => {
-        set({ error: null });
-    },
+    clearError: () => set({ error: null }),
 }));

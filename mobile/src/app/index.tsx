@@ -1,4 +1,5 @@
-import { useEffect } from 'react';
+
+import React from 'react';
 import { Redirect } from 'expo-router';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { LoadingSpinner } from '@/components/ui';
@@ -15,5 +16,5 @@ export default function Index() {
         return <Redirect href="/(consumer)" />;
     }
 
-    return <Redirect href="/(auth)/login" />;
+    return <Redirect href="/(auth)/welcome" />;
 }

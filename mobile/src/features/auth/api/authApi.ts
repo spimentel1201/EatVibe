@@ -1,4 +1,3 @@
-import apiClient from '@/core/api/client';
 import { AuthResponse, LoginRequest, RegisterRequest, User } from '../types';
 
 // Mock user data

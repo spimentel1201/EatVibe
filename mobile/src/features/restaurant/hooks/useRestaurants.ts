@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import * as restaurantApi from '../api/restaurantApi';
-import { Restaurant, RestaurantSearchParams } from '../types';
+import type { RestaurantSearchParams } from '../types';
 
 /**
  * Hook to fetch restaurants by location

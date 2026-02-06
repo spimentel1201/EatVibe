@@ -6,12 +6,12 @@ import {
     KeyboardAvoidingView,
     Platform,
     TouchableOpacity,
-    Alert,
+    TextInput
 } from 'react-native';
 import { useRouter, Link } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Button, Input } from '@/components/ui';
 import { useAuth } from '@/features/auth/hooks/useAuth';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function LoginScreen() {
     const router = useRouter();
@@ -21,30 +21,24 @@ export default function LoginScreen() {
     const [password, setPassword] = useState('');
     const [emailError, setEmailError] = useState('');
     const [passwordError, setPasswordError] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
 
     const validateForm = (): boolean => {
         let isValid = true;
-
-        // Reset errors
         setEmailError('');
         setPasswordError('');
         clearError();
 
-        // Validate email
         if (!email) {
-            setEmailError('El correo es requerido');
+            setEmailError('Email Address is required');
             isValid = false;
         } else if (!/\S+@\S+\.\S+/.test(email)) {
-            setEmailError('Correo inválido');
+            setEmailError('Invalid email address');
             isValid = false;
         }
 
-        // Validate password
         if (!password) {
-            setPasswordError('La contraseña es requerida');
-            isValid = false;
-        } else if (password.length < 6) {
-            setPasswordError('La contraseña debe tener al menos 6 caracteres');
+            setPasswordError('Password is required');
             isValid = false;
         }
 
@@ -58,8 +52,7 @@ export default function LoginScreen() {
             await login({ email, password });
             router.replace('/(consumer)');
         } catch (err) {
-            // Error is handled by the store
-            console.error('Login error:', err);
+            // Error handled by store
         }
     };
 
@@ -69,110 +62,118 @@ export default function LoginScreen() {
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 className="flex-1"
             >
+                {/* Header with Back Button and Logo */}
+                <View className="px-5 pt-2 mb-4 flex-row items-center">
+                    <TouchableOpacity onPress={() => router.back()} className="w-10 h-10 items-center justify-center bg-white border border-gray-100 rounded-full shadow-sm">
+                        <Ionicons name="chevron-back" size={24} color="#1F2937" />
+                    </TouchableOpacity>
+
+                    <View className="flex-1 flex-row justify-center items-center mr-10">
+                        <View className="bg-[#FF5722] p-1.5 rounded-lg mr-2">
+                            <Ionicons name="bicycle" size={16} color="white" />
+                        </View>
+                        <Text className="text-xl font-bold text-gray-900 tracking-tight">FoodRush</Text>
+                    </View>
+                </View>
+
                 <ScrollView
                     className="flex-1"
                     contentContainerStyle={{ flexGrow: 1 }}
                     keyboardShouldPersistTaps="handled"
                 >
-                    <View className="flex-1 px-6 justify-center">
-                        {/* Logo and Title */}
-                        <View className="items-center mb-12">
-                            <Text className="text-5xl mb-4">🍔</Text>
-                            <Text className="text-3xl font-bold text-text-primary mb-2">FoodRush</Text>
-                            <Text className="text-base text-text-secondary">
-                                Tu comida favorita en minutos
-                            </Text>
-                        </View>
+                    <View className="px-6 pt-2">
+                        {/* Title Section */}
+                        <Text className="text-4xl font-extrabold text-gray-900 mb-2">Welcome Back</Text>
+                        <Text className="text-gray-500 text-base mb-10">Sign in to continue ordering your favorites.</Text>
 
-                        {/* Login Form */}
-                        <View className="mb-6">
-                            <Input
-                                label="Correo electrónico"
-                                placeholder="tu@email.com"
-                                value={email}
-                                onChangeText={setEmail}
-                                keyboardType="email-address"
-                                autoCapitalize="none"
-                                autoComplete="email"
-                                error={emailError}
-                                className="mb-4"
-                            />
+                        {/* Form */}
+                        <View className="space-y-6">
+                            {/* Email Input */}
+                            <View>
+                                <Text className="font-bold text-gray-900 mb-2 ml-1 text-sm">Email Address</Text>
+                                <View className={`flex-row items-center bg-gray-50 rounded-[20px] px-5 py-4 border ${emailError ? 'border-red-500' : 'border-gray-100'}`}>
+                                    <TextInput
+                                        className="flex-1 text-gray-900 text-base"
+                                        placeholder="hello@example.com"
+                                        value={email}
+                                        onChangeText={setEmail}
+                                        keyboardType="email-address"
+                                        autoCapitalize="none"
+                                        placeholderTextColor="#9CA3AF"
+                                    />
+                                </View>
+                                {emailError ? <Text className="text-red-500 text-xs mt-1 ml-2">{emailError}</Text> : null}
+                            </View>
 
-                            <Input
-                                label="Contraseña"
-                                placeholder="••••••••"
-                                value={password}
-                                onChangeText={setPassword}
-                                secureTextEntry
-                                autoCapitalize="none"
-                                autoComplete="password"
-                                error={passwordError}
-                                className="mb-2"
-                            />
+                            {/* Password Input */}
+                            <View>
+                                <Text className="font-bold text-gray-900 mb-2 ml-1 text-sm">Password</Text>
+                                <View className={`flex-row items-center bg-gray-50 rounded-[20px] px-5 py-4 border ${passwordError ? 'border-red-500' : 'border-gray-100'}`}>
+                                    <TextInput
+                                        className="flex-1 text-gray-900 text-base"
+                                        placeholder="••••••••"
+                                        value={password}
+                                        onChangeText={setPassword}
+                                        secureTextEntry={!showPassword}
+                                        autoCapitalize="none"
+                                        placeholderTextColor="#9CA3AF"
+                                    />
+                                    <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                                        <Ionicons name={showPassword ? "eye-off" : "eye"} size={20} color="#9CA3AF" />
+                                    </TouchableOpacity>
+                                </View>
+                                {passwordError ? <Text className="text-red-500 text-xs mt-1 ml-2">{passwordError}</Text> : null}
+                            </View>
 
-                            <TouchableOpacity className="self-end mb-6">
-                                <Text className="text-sm text-primary font-semibold">
-                                    ¿Olvidaste tu contraseña?
-                                </Text>
+                            {/* Forgot Password */}
+                            <TouchableOpacity className="self-end">
+                                <Text className="text-[#FF5722] font-bold text-sm">Forgot Password?</Text>
                             </TouchableOpacity>
 
+                            {/* General Error */}
                             {error && (
-                                <View className="bg-error/10 p-3 rounded-xl mb-4">
-                                    <Text className="text-error text-sm text-center">{error}</Text>
+                                <View className="bg-red-50 p-3 rounded-xl">
+                                    <Text className="text-red-500 text-sm text-center">{error}</Text>
                                 </View>
                             )}
 
-                            <Button
-                                variant="primary"
-                                size="lg"
+                            {/* Login Button */}
+                            <TouchableOpacity
                                 onPress={handleLogin}
-                                loading={isLoading}
-                                className="mb-4"
+                                disabled={isLoading}
+                                className={`bg-[#FF5722] py-4 rounded-full shadow-lg shadow-orange-500/30 items-center justify-center mt-2 ${isLoading ? 'opacity-70' : ''}`}
                             >
-                                Iniciar Sesión
-                            </Button>
-
-                            {/* Demo Credentials */}
-                            <View className="bg-info/10 p-3 rounded-xl mb-4">
-                                <Text className="text-info text-xs text-center font-semibold mb-1">
-                                    Credenciales de prueba:
+                                <Text className="text-white font-bold text-lg">
+                                    {isLoading ? 'Signing In...' : 'Sign In'}
                                 </Text>
-                                <Text className="text-info text-xs text-center">
-                                    Email: user@foodrush.com
-                                </Text>
-                                <Text className="text-info text-xs text-center">Password: password</Text>
-                            </View>
-                        </View>
+                            </TouchableOpacity>
 
-                        {/* Social Login */}
-                        <View className="mb-6">
-                            <View className="flex-row items-center mb-4">
-                                <View className="flex-1 h-px bg-gray-300" />
-                                <Text className="mx-4 text-sm text-text-secondary">O continúa con</Text>
-                                <View className="flex-1 h-px bg-gray-300" />
+                            {/* OR Divider */}
+                            <View className="flex-row items-center py-6">
+                                <View className="flex-1 h-[1px] bg-gray-100" />
+                                <Text className="mx-4 text-gray-400 font-bold text-xs uppercase">Or continue with</Text>
+                                <View className="flex-1 h-[1px] bg-gray-100" />
                             </View>
 
-                            <View className="flex-row gap-4">
-                                <Button variant="outline" size="md" className="flex-1">
-                                    <Text className="text-base mr-2">🔍</Text>
-                                    <Text>Google</Text>
-                                </Button>
-
-                                <Button variant="outline" size="md" className="flex-1">
-                                    <Text className="text-base mr-2">🍎</Text>
-                                    <Text>Apple</Text>
-                                </Button>
-                            </View>
-                        </View>
-
-                        {/* Register Link */}
-                        <View className="flex-row justify-center">
-                            <Text className="text-sm text-text-secondary">¿No tienes cuenta? </Text>
-                            <Link href="/(auth)/register" asChild>
-                                <TouchableOpacity>
-                                    <Text className="text-sm text-primary font-semibold">Regístrate</Text>
+                            {/* Social Buttons */}
+                            <View className="flex-row justify-center space-x-6 mb-8">
+                                <TouchableOpacity className="w-16 h-16 items-center justify-center bg-white border border-gray-100 rounded-full shadow-sm">
+                                    <Ionicons name="logo-google" size={24} color="black" />
                                 </TouchableOpacity>
-                            </Link>
+                                <TouchableOpacity className="w-16 h-16 items-center justify-center bg-white border border-gray-100 rounded-full shadow-sm">
+                                    <Ionicons name="logo-apple" size={26} color="black" />
+                                </TouchableOpacity>
+                            </View>
+
+                            {/* Footer */}
+                            <View className="flex-row justify-center py-8 bg-gray-50 -mx-6 mb-[-40px]">
+                                <Text className="text-gray-600 text-base">Don't have an account? </Text>
+                                <Link href="/(auth)/register" asChild>
+                                    <TouchableOpacity>
+                                        <Text className="text-[#FF5722] font-bold text-base">Sign Up</Text>
+                                    </TouchableOpacity>
+                                </Link>
+                            </View>
                         </View>
                     </View>
                 </ScrollView>

@@ -1,5 +1,3 @@
-/// <reference types="expo/types" />
-
 // Declare module for CSS imports
 declare module '*.css' {
     const content: any;

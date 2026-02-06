@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from 'axios';
+import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
@@ -8,7 +8,7 @@ const ACCESS_TOKEN_KEY = 'access_token';
 const REFRESH_TOKEN_KEY = 'refresh_token';
 
 // Create Axios instance
-const apiClient: AxiosInstance = axios.create({
+const apiClient = axios.create({
     baseURL: API_BASE_URL,
     timeout: 15000,
     headers: {
@@ -18,7 +18,7 @@ const apiClient: AxiosInstance = axios.create({
 
 // Request interceptor to add JWT token
 apiClient.interceptors.request.use(
-    async (config: InternalAxiosRequestConfig) => {
+    async (config: any) => {
         try {
             const token = await SecureStore.getItemAsync(ACCESS_TOKEN_KEY);
             if (token && config.headers) {
@@ -29,16 +29,16 @@ apiClient.interceptors.request.use(
         }
         return config;
     },
-    (error: AxiosError) => {
+    (error: any) => {
         return Promise.reject(error);
     }
 );
 
 // Response interceptor for 401 handling and token refresh
 apiClient.interceptors.response.use(
-    response => response,
-    async (error: AxiosError) => {
-        const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+    (response: any) => response,
+    async (error: any) => {
+        const originalRequest = error.config;
 
         // Handle 401 Unauthorized
         if (error.response?.status === 401 && !originalRequest._retry) {

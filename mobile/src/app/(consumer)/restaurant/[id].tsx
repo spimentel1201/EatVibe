@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
     View,
     Text,
-    ScrollView,
     Image,
     TouchableOpacity,
     Animated,
     Alert,
 } from 'react-native';
+
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRestaurantDetail } from '@/features/restaurant/hooks/useRestaurantDetail';
@@ -174,13 +174,14 @@ export default function RestaurantDetailScreen() {
                     <Text className="text-xl font-bold text-text-primary mb-4">Menú</Text>
 
                     {menu && menu.length > 0 ? (
-                        menu.map(item => (
+                        menu.map((item: MenuItem) => (
                             <MenuItemCard
                                 key={item.id}
                                 item={item}
                                 onAddToCart={() => handleAddToCart(item)}
                             />
                         ))
+
                     ) : (
                         <View className="py-12 items-center">
                             <Text className="text-4xl mb-4">🍽️</Text>

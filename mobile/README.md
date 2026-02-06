@@ -1,6 +1,6 @@
-# Mobile - FoodRush
+# Mobile - EatVibe
 
-Aplicación móvil de FoodRush para iOS y Android.
+Aplicación móvil de EatVibe para iOS y Android.
 
 ## 🚀 Stack Tecnológico
 

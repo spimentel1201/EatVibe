@@ -3,10 +3,11 @@
 -- ============================================
 
 -- Courier 1: Juan Perez (Bicycle, Available)
-INSERT INTO couriers (id, name, phone, email, vehicle_type, status, rating)
+INSERT INTO couriers (id, first_name, last_name, phone, email, vehicle_type, status, rating)
 VALUES (
     'cccc1111-cccc-1111-cccc-111111111111',
-    'Juan Perez',
+    'Juan',
+    'Perez',
     '+51900000001',
     'juan.perez@foodrush.com',
     'BICYCLE',
@@ -25,10 +26,11 @@ VALUES (
 
 
 -- Courier 2: Maria Lopez (Motorcycle, On Delivery)
-INSERT INTO couriers (id, name, phone, email, vehicle_type, status, rating)
+INSERT INTO couriers (id, first_name, last_name, phone, email, vehicle_type, status, rating)
 VALUES (
     'cccc2222-cccc-2222-cccc-222222222222',
-    'Maria Lopez',
+    'Maria',
+    'Lopez',
     '+51900000002',
     'maria.lopez@foodrush.com',
     'MOTORCYCLE',
@@ -47,10 +49,11 @@ VALUES (
 
 
 -- Courier 3: Carlos Ramos (Car, Offline)
-INSERT INTO couriers (id, name, phone, email, vehicle_type, status, rating)
+INSERT INTO couriers (id, first_name, last_name, phone, email, vehicle_type, status, rating)
 VALUES (
     'cccc3333-cccc-3333-cccc-333333333333',
-    'Carlos Ramos',
+    'Carlos',
+    'Ramos',
     '+51900000003',
     'carlos.ramos@foodrush.com',
     'CAR',

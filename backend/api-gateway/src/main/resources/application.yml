@@ -30,12 +30,6 @@ spring:
           uri: ${COURIER_SERVICE_URI:http://localhost:8086}
           predicates:
             - Path=/api/v1/couries/**
-          filters:
-            - AuthenticationFilter
-            
-          filters:
-            - AuthenticationFilter
-
         - id: payment-service
           uri: ${PAYMENT_SERVICE_URI:http://localhost:8085}
           predicates:

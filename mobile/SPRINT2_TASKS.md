@@ -76,30 +76,30 @@
 
 ---
 
-## 📱 Fase 3: Sub-pantallas de Profile (PENDIENTE)
+## 📱 Fase 3: Sub-pantallas de Profile (EN PROGRESO)
 
-### 3.1 Edit Personal Information ⏳
-- [ ] Formulario de edición de perfil
-- [ ] Campos: nombre, email, teléfono
-- [ ] Validación de campos
-- [ ] Botón "Save Changes"
-- [ ] Integración con API
+### 3.1 Edit Personal Information ✅
+- [x] Formulario de edición de perfil
+- [x] Campos: nombre, email, teléfono, avatar
+- [x] Validación de campos
+- [x] Botón "Save Changes"
+- [x] Integración con API (Mocked)
 
-### 3.2 Manage Addresses ⏳
-- [ ] Lista de direcciones guardadas
-- [ ] Botón "Add New Address"
-- [ ] Modal/Screen de agregar dirección
-- [ ] Integración con Google Places API
-- [ ] Marcar dirección como favorita
-- [ ] Editar/Eliminar dirección
+### 3.2 Manage Addresses ✅
+- [x] Lista de direcciones guardadas
+- [x] Botón "Add New Address"
+- [x] Modal/Screen de agregar dirección (navigatable)
+- [x] Integración con Google Places API (Mocked functionality)
+- [x] Marcar dirección como favorita
+- [x] Editar/Eliminar dirección
 
-### 3.3 Manage Payment Methods ⏳
-- [ ] Lista de métodos de pago guardados
-- [ ] Botón "Add Payment Method"
-- [ ] Formulario de tarjeta
-- [ ] Integración con Stripe/MercadoPago
-- [ ] Marcar método como predeterminado
-- [ ] Eliminar método de pago
+### 3.3 Manage Payment Methods ✅
+- [x] Lista de métodos de pago guardados
+- [x] Botón "Add Payment Method"
+- [x] Formulario de tarjeta (Mocked visuals)
+- [x] Integración con Stripe/MercadoPago (Mocked functionality)
+- [x] Marcar método como predeterminado
+- [x] Eliminar método de pago
 
 ### 3.4 Notification Settings ⏳
 - [ ] Toggle para notificaciones push
@@ -188,10 +188,10 @@
 ## 📊 Métricas de Progreso
 
 - **Total de tareas**: 67
-- **Completadas**: 40 ✅
-- **En progreso**: 0 🔄
-- **Pendientes**: 27 ⏳
-- **Progreso**: 60%
+- **Completadas**: 55 ✅
+- **En progreso**: 1 🔄
+- **Pendientes**: 11 ⏳
+- **Progreso**: 82%
 
 ---
 

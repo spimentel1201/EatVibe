@@ -1,11 +1,7 @@
 import axios from 'axios';
-import * as SecureStore from 'expo-secure-store';
+import { tokenStorage } from '../storage/tokenStorage';
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
-
-// Token storage keys
-const ACCESS_TOKEN_KEY = 'access_token';
-const REFRESH_TOKEN_KEY = 'refresh_token';
 
 // Create Axios instance
 const apiClient = axios.create({
@@ -16,11 +12,30 @@ const apiClient = axios.create({
     },
 });
 
+// Flag to prevent multiple refresh token requests
+let isRefreshing = false;
+let failedQueue: Array<{
+    resolve: (value?: any) => void;
+    reject: (reason?: any) => void;
+}> = [];
+
+const processQueue = (error: any, token: string | null = null) => {
+    failedQueue.forEach((prom) => {
+        if (error) {
+            prom.reject(error);
+        } else {
+            prom.resolve(token);
+        }
+    });
+
+    failedQueue = [];
+};
+
 // Request interceptor to add JWT token
 apiClient.interceptors.request.use(
     async (config: any) => {
         try {
-            const token = await SecureStore.getItemAsync(ACCESS_TOKEN_KEY);
+            const token = await tokenStorage.getAccessToken();
             if (token && config.headers) {
                 config.headers.Authorization = `Bearer ${token}`;
             }
@@ -42,14 +57,32 @@ apiClient.interceptors.response.use(
 
         // Handle 401 Unauthorized
         if (error.response?.status === 401 && !originalRequest._retry) {
+            if (isRefreshing) {
+                // If already refreshing, queue this request
+                return new Promise((resolve, reject) => {
+                    failedQueue.push({ resolve, reject });
+                })
+                    .then((token) => {
+                        if (originalRequest.headers) {
+                            originalRequest.headers.Authorization = `Bearer ${token}`;
+                        }
+                        return apiClient(originalRequest);
+                    })
+                    .catch((err) => {
+                        return Promise.reject(err);
+                    });
+            }
+
             originalRequest._retry = true;
+            isRefreshing = true;
 
             try {
-                const refreshToken = await SecureStore.getItemAsync(REFRESH_TOKEN_KEY);
+                const refreshToken = await tokenStorage.getRefreshToken();
 
                 if (!refreshToken) {
-                    // No refresh token available, redirect to login
-                    await clearTokens();
+                    // No refresh token available, clear tokens and reject
+                    await tokenStorage.clearTokens();
+                    processQueue(new Error('No refresh token available'), null);
                     throw new Error('No refresh token available');
                 }
 
@@ -61,20 +94,24 @@ apiClient.interceptors.response.use(
                 const { accessToken, refreshToken: newRefreshToken } = response.data;
 
                 // Save new tokens
-                await SecureStore.setItemAsync(ACCESS_TOKEN_KEY, accessToken);
-                if (newRefreshToken) {
-                    await SecureStore.setItemAsync(REFRESH_TOKEN_KEY, newRefreshToken);
-                }
+                await tokenStorage.saveTokens(accessToken, newRefreshToken || refreshToken);
+
+                // Process queued requests
+                processQueue(null, accessToken);
 
                 // Retry the original request with new token
                 if (originalRequest.headers) {
                     originalRequest.headers.Authorization = `Bearer ${accessToken}`;
                 }
+
                 return apiClient(originalRequest);
             } catch (refreshError) {
-                // Refresh failed, clear tokens and redirect to login
-                await clearTokens();
+                // Refresh failed, clear tokens and reject all queued requests
+                processQueue(refreshError, null);
+                await tokenStorage.clearTokens();
                 return Promise.reject(refreshError);
+            } finally {
+                isRefreshing = false;
             }
         }
 
@@ -82,15 +119,4 @@ apiClient.interceptors.response.use(
     }
 );
 
-// Helper function to clear tokens
-const clearTokens = async () => {
-    try {
-        await SecureStore.deleteItemAsync(ACCESS_TOKEN_KEY);
-        await SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY);
-    } catch (error) {
-        console.error('Error clearing tokens:', error);
-    }
-};
-
 export default apiClient;
-export { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY };

@@ -1,0 +1,54 @@
+{
+  "expo": {
+    "name": "FoodRush",
+    "slug": "foodrush-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "scheme": "foodrush",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FF5722"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.foodrush.app",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "FoodRush necesita tu ubicación para mostrarte restaurantes cercanos.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "FoodRush necesita tu ubicación para mostrarte restaurantes cercanos y rastrear entregas."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#FF5722"
+      },
+      "package": "com.foodrush.app",
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION"
+      ],
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "FoodRush necesita tu ubicación para mostrarte restaurantes cercanos."
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

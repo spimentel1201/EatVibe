@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useCartStore } from '@/features/cart/store/useCartStore';
+import { CartItem } from '@/features/cart/types';
 
 export default function CheckoutScreen() {
     const router = useRouter();
@@ -74,7 +75,7 @@ export default function CheckoutScreen() {
                 {/* Order Items */}
                 <View className="px-6 py-6">
                     <Text className="text-lg font-bold text-gray-900 mb-4">Your Order</Text>
-                    {items.map((item) => (
+                    {items.map((item: CartItem) => (
                         <View
                             key={item.id}
                             className="flex-row items-center bg-gray-50 rounded-[24px] p-4 mb-3"

@@ -19,8 +19,8 @@ export default function OrderTrackingScreen() {
     const params = useLocalSearchParams();
     const orderId = params.id as string;
 
-    const [currentStatus, setCurrentStatus] = useState<OrderStatus>('preparing');
-    const [estimatedTime, setEstimatedTime] = useState('25-30 min');
+    const [currentStatus, _setCurrentStatus] = useState<OrderStatus>('preparing');
+    const [estimatedTime, _setEstimatedTime] = useState('25-30 min');
 
     const orderSteps: OrderStep[] = [
         {

@@ -68,7 +68,7 @@ export default function ProfileScreen() {
                 </View>
 
                 {/* Profile Sections */}
-                {profileSections.map((section, sectionIndex) => (
+                {profileSections.map((section, _sectionIndex) => (
                     <View key={section.title} className="px-6 mb-8">
                         <Text className="text-lg font-bold text-gray-900 mb-4">{section.title}</Text>
                         <View className="bg-gray-50 rounded-[28px] overflow-hidden">

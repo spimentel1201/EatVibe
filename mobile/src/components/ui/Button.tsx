@@ -5,6 +5,14 @@ import {
     ActivityIndicator,
     TouchableOpacityProps,
 } from 'react-native';
+import Animated, {
+    useAnimatedStyle,
+    useSharedValue,
+    withSpring,
+} from 'react-native-reanimated';
+import { ANIMATION_SCALE, SPRING_CONFIG } from '@/core/animations/constants';
+
+const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
 interface ButtonProps extends TouchableOpacityProps {
     variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
@@ -21,8 +29,26 @@ export const Button: React.FC<ButtonProps> = ({
     disabled,
     children,
     className = '',
+    onPressIn,
+    onPressOut,
     ...props
 }) => {
+    const scale = useSharedValue(1);
+
+    const animatedStyle = useAnimatedStyle(() => ({
+        transform: [{ scale: scale.value }],
+    }));
+
+    const handlePressIn = (e: any) => {
+        scale.value = withSpring(ANIMATION_SCALE.PRESS, SPRING_CONFIG.GENTLE);
+        onPressIn?.(e);
+    };
+
+    const handlePressOut = (e: any) => {
+        scale.value = withSpring(ANIMATION_SCALE.NORMAL, SPRING_CONFIG.GENTLE);
+        onPressOut?.(e);
+    };
+
     const getVariantStyles = (): string => {
         switch (variant) {
             case 'primary':
@@ -96,10 +122,13 @@ export const Button: React.FC<ButtonProps> = ({
   `.trim();
 
     return (
-        <TouchableOpacity
+        <AnimatedTouchable
             className={buttonClasses}
             disabled={disabled || loading}
             activeOpacity={0.7}
+            onPressIn={handlePressIn}
+            onPressOut={handlePressOut}
+            style={animatedStyle}
             {...props}
         >
             {loading ? (
@@ -110,6 +139,6 @@ export const Button: React.FC<ButtonProps> = ({
             ) : (
                 <Text className={textClasses}>{children}</Text>
             )}
-        </TouchableOpacity>
+        </AnimatedTouchable>
     );
 };

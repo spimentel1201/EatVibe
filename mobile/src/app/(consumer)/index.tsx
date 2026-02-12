@@ -47,32 +47,56 @@ const RESTAURANTS = [
     }
 ];
 
+import { useLocation } from '@/core/location/useLocation';
+import { RefreshControl } from 'react-native';
+
 export default function HomeScreen() {
     const router = useRouter();
     const [activeCategory, setActiveCategory] = React.useState(1);
+    const { address, isLoading: isLocationLoading, refreshLocation } = useLocation();
+    const [refreshing, setRefreshing] = React.useState(false);
+
+    const onRefresh = React.useCallback(async () => {
+        setRefreshing(true);
+        await refreshLocation();
+        setRefreshing(false);
+    }, []);
 
     // Filter Logic (Simple Mock)
     const filteredRestaurants = React.useMemo(() => {
-        if (activeCategory === 1) return RESTAURANTS; // Show all for 'Burger' (as default/popular) or mock logic
+        if (activeCategory === 1) return RESTAURANTS;
         const selectedCat = CATEGORIES.find(c => c.id === activeCategory);
         if (!selectedCat) return RESTAURANTS;
 
-        // Simple filter by tag matching
         return RESTAURANTS.filter(r =>
-            r.tags.some(tag => tag.includes(selectedCat.type)) || selectedCat.name === 'Burger' // Fallback for demo
+            r.tags.some(tag => tag.includes(selectedCat.type)) || selectedCat.name === 'Burger'
         );
     }, [activeCategory]);
 
     return (
         <SafeAreaView className="flex-1 bg-gray-50">
-            <ScrollView className="px-5 pt-2" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 100 }}>
+            <ScrollView
+                className="px-5 pt-2"
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={{ paddingBottom: 100 }}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                        colors={['#FF5722']}
+                        tintColor="#FF5722"
+                    />
+                }
+            >
 
                 {/* HEADER - With extra padding/rounded feel */}
                 <View className="flex-row justify-between items-center mb-5 mt-2">
                     <View className="flex-1">
-                        <TouchableOpacity className="flex-row items-center active:opacity-70">
+                        <TouchableOpacity className="flex-row items-center active:opacity-70" onPress={refreshLocation}>
                             <Ionicons name="location" size={22} color="#FF5722" />
-                            <Text className="font-bold text-lg ml-2 text-gray-800">Home - Av. Larco 123</Text>
+                            <Text className="font-bold text-lg ml-2 text-gray-800" numberOfLines={1}>
+                                {isLocationLoading ? 'Locating...' : (address || 'Select Location')}
+                            </Text>
                             <Ionicons name="chevron-down" size={18} color="#FF5722" className="ml-1" />
                         </TouchableOpacity>
                         <Text className="text-gray-400 text-sm ml-7 mt-0.5 font-medium">Delivering to your door</Text>
@@ -105,7 +129,7 @@ export default function HomeScreen() {
                 {/* CATEGORIES - Interactive */}
                 <View className="mb-8">
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} className="overflow-visible">
-                        {CATEGORIES.map((cat, index) => {
+                        {CATEGORIES.map((cat) => {
                             const isActive = activeCategory === cat.id;
                             return (
                                 <TouchableOpacity

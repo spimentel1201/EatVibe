@@ -1,43 +1,49 @@
 import { useState, useEffect } from 'react';
 import * as Location from 'expo-location';
-import { Coordinates } from '@/core/api/types';
+
+export interface Coordinates {
+    latitude: number;
+    longitude: number;
+}
 
 interface UseLocationReturn {
     location: Coordinates | null;
+    address: string | null;
     error: string | null;
-    loading: boolean;
+    isLoading: boolean;
     requestPermission: () => Promise<boolean>;
     refreshLocation: () => Promise<void>;
 }
 
 export const useLocation = (): UseLocationReturn => {
     const [location, setLocation] = useState<Coordinates | null>(null);
+    const [address, setAddress] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
-    const [loading, setLoading] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const requestPermission = async (): Promise<boolean> => {
         try {
             const { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== 'granted') {
-                setError('Permiso de ubicación denegado');
+                setError('Location permission denied');
                 return false;
             }
             return true;
         } catch (err) {
-            setError('Error al solicitar permisos de ubicación');
+            setError('Error requesting location permissions');
             console.error('Location permission error:', err);
             return false;
         }
     };
 
     const refreshLocation = async (): Promise<void> => {
-        setLoading(true);
+        setIsLoading(true);
         setError(null);
 
         try {
             const hasPermission = await requestPermission();
             if (!hasPermission) {
-                setLoading(false);
+                setIsLoading(false);
                 return;
             }
 
@@ -45,15 +51,24 @@ export const useLocation = (): UseLocationReturn => {
                 accuracy: Location.Accuracy.Balanced,
             });
 
-            setLocation({
+            const coords = {
                 latitude: currentLocation.coords.latitude,
                 longitude: currentLocation.coords.longitude,
-            });
+            };
+            setLocation(coords);
+
+            // Reverse Geocoding
+            const reverseGeocode = await Location.reverseGeocodeAsync(coords);
+            if (reverseGeocode.length > 0) {
+                const addr = reverseGeocode[0];
+                const formattedAddress = `${addr.street || ''} ${addr.name || ''}, ${addr.district || addr.city || ''}`;
+                setAddress(formattedAddress.trim().replace(/^,/, '').trim() || 'Custom Location');
+            }
         } catch (err) {
-            setError('Error al obtener la ubicación');
+            setError('Error obtaining location');
             console.error('Location error:', err);
         } finally {
-            setLoading(false);
+            setIsLoading(false);
         }
     };
 
@@ -63,8 +78,9 @@ export const useLocation = (): UseLocationReturn => {
 
     return {
         location,
+        address,
         error,
-        loading,
+        isLoading,
         requestPermission,
         refreshLocation,
     };

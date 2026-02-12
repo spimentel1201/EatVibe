@@ -1,6 +1,4 @@
 import { create } from 'zustand';
-import { tokenStorage } from '@/core/storage/tokenStorage';
-import * as authApi from '../api/authApi';
 import { User, LoginRequest, RegisterRequest } from '../types';
 
 export interface AuthStore {

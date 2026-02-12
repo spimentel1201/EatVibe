@@ -112,6 +112,20 @@ export default function ConsumerLayout() {
                     tabBarStyle: { display: 'none' }
                 }}
             />
+            <Tabs.Screen
+                name="order/feedback"
+                options={{
+                    href: null,
+                    tabBarStyle: { display: 'none' }
+                }}
+            />
+            <Tabs.Screen
+                name="order/feedback-confirmation"
+                options={{
+                    href: null,
+                    tabBarStyle: { display: 'none' }
+                }}
+            />
         </Tabs>
     );
 }

@@ -74,9 +74,18 @@ export default function ConsumerLayout() {
             <Tabs.Screen
                 name="orders"
                 options={{
-                    title: 'History',
+                    title: 'Orders',
                     tabBarIcon: ({ color, focused }) => (
-                        <Ionicons name={focused ? "time" : "time-outline"} size={26} color={color} />
+                        <Ionicons name={focused ? "receipt" : "receipt-outline"} size={26} color={color} />
+                    ),
+                }}
+            />
+            <Tabs.Screen
+                name="profile"
+                options={{
+                    title: 'Profile',
+                    tabBarIcon: ({ color, focused }) => (
+                        <Ionicons name={focused ? "person" : "person-outline"} size={26} color={color} />
                     ),
                 }}
             />
@@ -84,6 +93,20 @@ export default function ConsumerLayout() {
             {/* Hidden Stack Routes */}
             <Tabs.Screen
                 name="restaurant/[id]"
+                options={{
+                    href: null,
+                    tabBarStyle: { display: 'none' }
+                }}
+            />
+            <Tabs.Screen
+                name="checkout"
+                options={{
+                    href: null,
+                    tabBarStyle: { display: 'none' }
+                }}
+            />
+            <Tabs.Screen
+                name="order/tracking"
                 options={{
                     href: null,
                     tabBarStyle: { display: 'none' }

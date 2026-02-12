@@ -32,10 +32,12 @@ export default function RestaurantDetailScreen() {
         setModalVisible(true);
     };
 
-    const handleAddToCart = (quantity: number) => {
+    const handleAddToCart = (quantity: number, selectedModifiers: any) => {
         if (selectedItem) {
+            // TODO: In the future, pass selectedModifiers to addItem for customization tracking
             addItem(selectedItem, quantity);
             setModalVisible(false);
+            console.log('Added to cart with modifiers:', selectedModifiers);
         }
     };
 

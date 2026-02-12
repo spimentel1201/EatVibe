@@ -8,8 +8,8 @@ import { useCartStore } from '@/features/cart/store/useCartStore';
 export default function CheckoutScreen() {
     const router = useRouter();
     const { items, getTotal, clearCart } = useCartStore();
-    const [deliveryAddress, setDeliveryAddress] = useState('123 Main St, Lima, Peru');
-    const [paymentMethod, setPaymentMethod] = useState('Visa •••• 4242');
+    const [deliveryAddress] = useState('123 Main St, Lima, Peru');
+    const [paymentMethod] = useState('Visa •••• 4242');
 
     const subtotal = getTotal();
     const deliveryFee = 5.0;
@@ -17,11 +17,45 @@ export default function CheckoutScreen() {
     const total = subtotal + deliveryFee + serviceFee;
 
     const handlePlaceOrder = () => {
-        // TODO: Implement order placement logic
+        // TODO: Implement order placement logic with backend
         console.log('Placing order...');
+
+        // Clear cart after successful order
+        clearCart();
+
         // Navigate to order tracking
-        router.push('/order/tracking');
+        router.push('/order/tracking?id=ORD-001' as any);
     };
+
+    // Handle empty cart
+    if (items.length === 0) {
+        return (
+            <SafeAreaView className="flex-1 bg-white" edges={['top']}>
+                <View className="flex-row items-center px-6 py-4 border-b border-gray-100">
+                    <TouchableOpacity
+                        onPress={() => router.back()}
+                        className="w-10 h-10 rounded-full bg-gray-50 items-center justify-center mr-4"
+                    >
+                        <Ionicons name="arrow-back" size={20} color="#1F2937" />
+                    </TouchableOpacity>
+                    <Text className="text-2xl font-black text-gray-900">Checkout</Text>
+                </View>
+                <View className="flex-1 items-center justify-center px-6">
+                    <Ionicons name="cart-outline" size={80} color="#D1D5DB" />
+                    <Text className="text-xl font-bold text-gray-900 mt-6">Your cart is empty</Text>
+                    <Text className="text-gray-400 text-center mt-2">
+                        Add some items to your cart before checking out
+                    </Text>
+                    <TouchableOpacity
+                        onPress={() => router.back()}
+                        className="bg-[#FF5722] px-8 py-3 rounded-full mt-8"
+                    >
+                        <Text className="text-white font-bold">Browse Menu</Text>
+                    </TouchableOpacity>
+                </View>
+            </SafeAreaView>
+        );
+    }
 
     return (
         <SafeAreaView className="flex-1 bg-white" edges={['top']}>

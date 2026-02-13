@@ -8,8 +8,8 @@ import { CartItem } from '@/features/cart/types';
 
 export default function CartScreen() {
     const router = useRouter();
-    const { items, removeItem, updateQuantity, getTotalPrice } = useCartStore();
-    const total = getTotalPrice();
+    const { items, removeItem, updateQuantity, getTotal } = useCartStore();
+    const total = getTotal();
 
     const handleCheckout = () => {
         router.push('/(consumer)/checkout' as any);

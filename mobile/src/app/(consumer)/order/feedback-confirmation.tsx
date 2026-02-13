@@ -3,40 +3,10 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, {
-    useSharedValue,
-    useAnimatedStyle,
-    withSpring,
-    withSequence,
-    withDelay,
-    FadeIn,
-    SlideInDown,
-} from 'react-native-reanimated';
+
 
 export default function FeedbackConfirmationScreen() {
     const router = useRouter();
-    const scale = useSharedValue(0);
-    const rotation = useSharedValue(0);
-
-    useEffect(() => {
-        // Celebration animation
-        scale.value = withSequence(
-            withSpring(1.2, { damping: 2 }),
-            withSpring(1, { damping: 3 })
-        );
-        rotation.value = withSequence(
-            withDelay(200, withSpring(10, { damping: 2 })),
-            withSpring(-10, { damping: 2 }),
-            withSpring(0, { damping: 3 })
-        );
-    }, []);
-
-    const animatedStyle = useAnimatedStyle(() => ({
-        transform: [
-            { scale: scale.value },
-            { rotate: `${rotation.value}deg` },
-        ],
-    }));
 
     const handleGoHome = () => {
         router.replace('/(consumer)' as any);

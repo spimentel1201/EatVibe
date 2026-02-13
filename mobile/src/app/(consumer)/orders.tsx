@@ -3,7 +3,7 @@ import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, { FadeInDown } from 'react-native-reanimated';
+// import Animated, { FadeInDown } from 'react-native-reanimated';
 
 const MOCK_ORDERS = [
     {
@@ -86,9 +86,8 @@ export default function OrdersScreen() {
                 {/* Orders List */}
                 <View>
                     {filteredOrders.map((order, index) => (
-                        <Animated.View
+                        <View
                             key={order.id}
-                            entering={FadeInDown.delay(index * 100).duration(400)}
                         >
                             <TouchableOpacity
                                 onPress={() => order.isActive && handleTrackOrder(order.id)}
@@ -140,7 +139,7 @@ export default function OrdersScreen() {
                                     )}
                                 </View>
                             </TouchableOpacity>
-                        </Animated.View>
+                        </View>
                     ))}
                 </View>
 

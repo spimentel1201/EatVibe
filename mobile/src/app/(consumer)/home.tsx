@@ -185,7 +185,11 @@ export default function HomeScreen() {
                             key={rest.id}
                             activeOpacity={0.95}
                             className="bg-white rounded-[28px] shadow-sm shadow-gray-200/50 mb-4 overflow-hidden border border-gray-100"
-                            onPress={() => router.push(`/restaurant/${rest.id}`)}
+                            onPress={() => {
+                                console.log(`Navigating to restaurant ${rest.id}`);
+                                // Try absolute path
+                                router.push('/restaurant-detail' as any);
+                            }}
                         >
                             {/* IMAGE SECTION */}
                             <View className="h-52 relative">

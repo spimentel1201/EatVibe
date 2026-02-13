@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Modal, TouchableOpacity, Image, ScrollView, Alert } from 'react-native';
-import Animated, { SlideInDown } from 'react-native-reanimated';
+// import Animated, { SlideInDown } from 'react-native-reanimated';
 import { MenuItem, MenuModifier } from '@/features/restaurant/types';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -120,8 +120,7 @@ export const ProductCustomizationModal: React.FC<ProductCustomizationModalProps>
     return (
         <Modal visible={visible} animationType="slide" transparent={true} onRequestClose={onClose}>
             <View className="flex-1 bg-black/50 justify-end">
-                <Animated.View
-                    entering={SlideInDown.duration(300)}
+                <View
                     className="bg-white rounded-t-[40px] h-[90%] overflow-hidden"
                 >
                     <ScrollView showsVerticalScrollIndicator={false}>
@@ -286,7 +285,7 @@ export const ProductCustomizationModal: React.FC<ProductCustomizationModalProps>
                             </TouchableOpacity>
                         </View>
                     </View>
-                </Animated.View>
+                </View>
             </View>
         </Modal>
     );

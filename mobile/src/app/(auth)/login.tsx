@@ -50,7 +50,10 @@ export default function LoginScreen() {
 
         try {
             await login({ email, password });
-            router.replace('/(consumer)');
+            // Small delay to ensure state updates before navigation
+            setTimeout(() => {
+                router.replace('/(consumer)/home');
+            }, 100);
         } catch (err) {
             // Error handled by store
         }

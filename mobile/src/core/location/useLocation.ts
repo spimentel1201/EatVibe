@@ -41,6 +41,17 @@ export const useLocation = (): UseLocationReturn => {
         setError(null);
 
         try {
+            // MOCK LOCATION FOR DEVELOPMENT to prevent native module errors
+            await new Promise(resolve => setTimeout(resolve, 800));
+
+            const mockCoords = {
+                latitude: -12.121980,
+                longitude: -77.029580 // Parque Kennedy, Lima
+            };
+            setLocation(mockCoords);
+            setAddress('Calle Los Pinos 123, Miraflores');
+
+            /* REAL IMPLEMENTATION COMMENTED OUT
             const hasPermission = await requestPermission();
             if (!hasPermission) {
                 setIsLoading(false);
@@ -50,20 +61,8 @@ export const useLocation = (): UseLocationReturn => {
             const currentLocation = await Location.getCurrentPositionAsync({
                 accuracy: Location.Accuracy.Balanced,
             });
-
-            const coords = {
-                latitude: currentLocation.coords.latitude,
-                longitude: currentLocation.coords.longitude,
-            };
-            setLocation(coords);
-
-            // Reverse Geocoding
-            const reverseGeocode = await Location.reverseGeocodeAsync(coords);
-            if (reverseGeocode.length > 0) {
-                const addr = reverseGeocode[0];
-                const formattedAddress = `${addr.street || ''} ${addr.name || ''}, ${addr.district || addr.city || ''}`;
-                setAddress(formattedAddress.trim().replace(/^,/, '').trim() || 'Custom Location');
-            }
+            // ... (rest of logic)
+            */
         } catch (err) {
             setError('Error obtaining location');
             console.error('Location error:', err);

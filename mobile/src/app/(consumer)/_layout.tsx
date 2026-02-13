@@ -23,10 +23,9 @@ export default function ConsumerLayout() {
                     borderTopWidth: 0,
                     elevation: 10,
                     shadowColor: '#000',
-                    shadowOffset: { width: 0, height: -10 },
-                    shadowOpacity: 0.05,
-                    shadowRadius: 10,
-                    position: 'absolute',
+                    shadowOffset: { width: 0, height: -5 },
+                    shadowOpacity: 0.1,
+                    shadowRadius: 5,
                 },
                 tabBarLabelStyle: {
                     fontSize: 10,
@@ -37,7 +36,7 @@ export default function ConsumerLayout() {
             }}
         >
             <Tabs.Screen
-                name="index"
+                name="home"
                 options={{
                     title: 'Home',
                     tabBarIcon: ({ color, focused }) => (

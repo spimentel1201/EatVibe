@@ -113,9 +113,25 @@ export const useAuth = create((set: any): AuthStore => ({
 
     checkAuth: async () => {
         set({ isLoading: true });
+        console.log('🔐 checkAuth: Iniciando verificación...');
+
         try {
-            // Verificar si hay tokens guardados
-            const hasTokens = await tokenStorage.hasTokens();
+            // FORCE CLEANUP: Limpiar tokens viejos para evitar conflictos
+            await tokenStorage.clearTokens();
+            console.log('🧹 Tokens limpiados forzosamente para debugging');
+
+            // Safety timeout: If SecureStore takes too long, abort.
+            const timeoutPromise = new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('Auth check timed out')), 5000)
+            );
+
+            // Verificar si hay tokens guardados con timeout
+            const hasTokens = await Promise.race([
+                tokenStorage.hasTokens(),
+                timeoutPromise
+            ]);
+
+            console.log('🔐 checkAuth: Tokens encontrados?', hasTokens);
 
             if (hasTokens) {
                 // En simulación, restaurar usuario mock si hay tokens
@@ -139,8 +155,9 @@ export const useAuth = create((set: any): AuthStore => ({
                 console.log('⚡ SIMULACION: No hay tokens, usuario no autenticado');
             }
         } catch (error) {
+            console.error('🔐 checkAuth ERROR:', error);
+            // En caso de error o timeout, asumimos logout para no bloquear la app
             set({ user: null, isAuthenticated: false, isLoading: false });
-            console.log('⚡ SIMULACION: Error al verificar auth');
         }
     },
 

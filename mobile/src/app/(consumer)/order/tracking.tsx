@@ -1,193 +1,367 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import { View, Text, TouchableOpacity, Image, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import MapView, { Marker, PROVIDER_GOOGLE, Polyline } from 'react-native-maps';
+
 type OrderStatus = 'confirmed' | 'preparing' | 'on_the_way' | 'delivered';
 
-interface OrderStep {
-    status: OrderStatus;
-    label: string;
-    icon: keyof typeof Ionicons.glyphMap;
-    completed: boolean;
-}
+const { height } = Dimensions.get('window');
+
+// Dark map style
+const darkMapStyle = [
+    {
+        "elementType": "geometry",
+        "stylers": [{ "color": "#242f3e" }]
+    },
+    {
+        "elementType": "labels.text.fill",
+        "stylers": [{ "color": "#746855" }]
+    },
+    {
+        "elementType": "labels.text.stroke",
+        "stylers": [{ "color": "#242f3e" }]
+    },
+    {
+        "featureType": "administrative.locality",
+        "elementType": "labels.text.fill",
+        "stylers": [{ "color": "#d59563" }]
+    },
+    {
+        "featureType": "poi",
+        "elementType": "labels.text.fill",
+        "stylers": [{ "color": "#d59563" }]
+    },
+    {
+        "featureType": "poi.park",
+        "elementType": "geometry",
+        "stylers": [{ "color": "#263c3f" }]
+    },
+    {
+        "featureType": "poi.park",
+        "elementType": "labels.text.fill",
+        "stylers": [{ "color": "#6b9a76" }]
+    },
+    {
+        "featureType": "road",
+        "elementType": "geometry",
+        "stylers": [{ "color": "#38414e" }]
+    },
+    {
+        "featureType": "road",
+        "elementType": "geometry.stroke",
+        "stylers": [{ "color": "#212a37" }]
+    },
+    {
+        "featureType": "road",
+        "elementType": "labels.text.fill",
+        "stylers": [{ "color": "#9ca5b3" }]
+    },
+    {
+        "featureType": "road.highway",
+        "elementType": "geometry",
+        "stylers": [{ "color": "#746855" }]
+    },
+    {
+        "featureType": "road.highway",
+        "elementType": "geometry.stroke",
+        "stylers": [{ "color": "#1f2835" }]
+    },
+    {
+        "featureType": "road.highway",
+        "elementType": "labels.text.fill",
+        "stylers": [{ "color": "#f3d19c" }]
+    },
+    {
+        "featureType": "transit",
+        "elementType": "geometry",
+        "stylers": [{ "color": "#2f3948" }]
+    },
+    {
+        "featureType": "transit.station",
+        "elementType": "labels.text.fill",
+        "stylers": [{ "color": "#d59563" }]
+    },
+    {
+        "featureType": "water",
+        "elementType": "geometry",
+        "stylers": [{ "color": "#17263c" }]
+    },
+    {
+        "featureType": "water",
+        "elementType": "labels.text.fill",
+        "stylers": [{ "color": "#515c6d" }]
+    },
+    {
+        "featureType": "water",
+        "elementType": "labels.text.stroke",
+        "stylers": [{ "color": "#17263c" }]
+    }
+];
 
 export default function OrderTrackingScreen() {
     const router = useRouter();
     const params = useLocalSearchParams();
-    const orderId = params.id as string;
+    const orderId = params.id as string || '8824';
+    const mapRef = useRef<any>(null);
 
-    const [currentStatus, _setCurrentStatus] = useState<OrderStatus>('preparing');
-    const [estimatedTime, _setEstimatedTime] = useState('25-30 min');
+    const [currentStatus, _setCurrentStatus] = useState<OrderStatus>('on_the_way');
+    const [estimatedTime] = useState('12 mins');
 
-    const orderSteps: OrderStep[] = [
-        {
-            status: 'confirmed',
-            label: 'Order Confirmed',
-            icon: 'checkmark-circle',
-            completed: true,
-        },
-        {
-            status: 'preparing',
-            label: 'Preparing',
-            icon: 'restaurant',
-            completed: currentStatus === 'preparing' || currentStatus === 'on_the_way' || currentStatus === 'delivered',
-        },
-        {
-            status: 'on_the_way',
-            label: 'On the way',
-            icon: 'bicycle',
-            completed: currentStatus === 'on_the_way' || currentStatus === 'delivered',
-        },
-        {
-            status: 'delivered',
-            label: 'Delivered',
-            icon: 'home',
-            completed: currentStatus === 'delivered',
-        },
-    ];
+    // Coordinates - Lima, Peru (Miraflores area)
+    const restaurantLocation = {
+        latitude: -12.1191,
+        longitude: -77.0350,
+    };
+
+    const [courierLocation, setCourierLocation] = useState({
+        latitude: -12.1150,
+        longitude: -77.0320,
+    });
+
+    const destinationLocation = {
+        latitude: -12.1100,
+        longitude: -77.0280,
+    };
 
     // Mock courier data
     const courier = {
-        name: 'Carlos Mendoza',
-        rating: 4.8,
-        phone: '+51 987 654 321',
-        avatar: 'https://i.pravatar.cc/150?img=12',
+        name: 'Ahmad R.',
+        licensePlate: 'B 1234 XYZ',
+        vehicle: 'Honda Vario',
+        avatar: 'https://i.pravatar.cc/150?img=33',
+        isOnline: true,
+    };
+
+    const getStatusStep = (status: OrderStatus): number => {
+        const steps = { confirmed: 0, preparing: 1, on_the_way: 2, delivered: 3 };
+        return steps[status] || 0;
+    };
+
+    const currentStep = getStatusStep(currentStatus);
+
+    // Simulate courier movement (replace with real-time updates from backend)
+    useEffect(() => {
+        if (currentStatus === 'on_the_way') {
+            const interval = setInterval(() => {
+                setCourierLocation(prev => ({
+                    latitude: prev.latitude + (Math.random() - 0.5) * 0.0005,
+                    longitude: prev.longitude + (Math.random() - 0.5) * 0.0005,
+                }));
+            }, 3000);
+
+            return () => clearInterval(interval);
+        }
+    }, [currentStatus]);
+
+    // Animate camera to follow courier
+    useEffect(() => {
+        if (currentStatus === 'on_the_way') {
+            mapRef.current?.animateToRegion({
+                latitude: courierLocation.latitude,
+                longitude: courierLocation.longitude,
+                latitudeDelta: 0.02,
+                longitudeDelta: 0.02,
+            }, 1000);
+        }
+    }, [courierLocation, currentStatus]);
+
+    const handleZoomIn = () => {
+        mapRef.current?.animateCamera({
+            zoom: 16,
+        }, { duration: 300 });
     };
 
     return (
-        <SafeAreaView className="flex-1 bg-white" edges={['top']}>
-            {/* Header */}
-            <View className="flex-row items-center px-6 py-4 border-b border-gray-100">
-                <TouchableOpacity
-                    onPress={() => router.back()}
-                    className="w-10 h-10 rounded-full bg-gray-50 items-center justify-center mr-4"
-                >
-                    <Ionicons name="arrow-back" size={20} color="#1F2937" />
-                </TouchableOpacity>
-                <View className="flex-1">
-                    <Text className="text-2xl font-black text-gray-900">Order Tracking</Text>
-                    <Text className="text-sm text-gray-500 mt-1">Order #{orderId || '12345'}</Text>
+        <View className="flex-1 bg-gray-900">
+            {/* Map Background - Full Screen */}
+            <MapView
+                ref={mapRef}
+                provider={PROVIDER_GOOGLE}
+                style={{ flex: 1 }}
+                initialRegion={{
+                    latitude: -12.1150,
+                    longitude: -77.0320,
+                    latitudeDelta: 0.02,
+                    longitudeDelta: 0.02,
+                }}
+                customMapStyle={darkMapStyle}
+            >
+                {/* Route Polyline */}
+                <Polyline
+                    coordinates={[
+                        restaurantLocation,
+                        courierLocation,
+                        destinationLocation,
+                    ]}
+                    strokeColor="#FF5722"
+                    strokeWidth={3}
+                    lineDashPattern={[1]}
+                />
+
+                {/* Restaurant/Origin Marker */}
+                <Marker coordinate={restaurantLocation}>
+                    <View className="w-8 h-8 rounded-full bg-orange-500 items-center justify-center">
+                        <View className="w-3 h-3 rounded-full bg-white" />
+                    </View>
+                </Marker>
+
+                {/* Courier Marker */}
+                <Marker coordinate={courierLocation}>
+                    <View className="items-center">
+                        {/* COURIER Badge */}
+                        <View className="bg-[#FF5722] px-3 py-1 rounded-full mb-2">
+                            <Text className="text-white text-xs font-bold">COURIER</Text>
+                        </View>
+                        {/* Courier Icon */}
+                        <View className="w-12 h-12 rounded-full bg-[#FF5722] items-center justify-center shadow-lg">
+                            <Ionicons name="bicycle" size={24} color="#FFF" />
+                        </View>
+                    </View>
+                </Marker>
+
+                {/* Destination Marker */}
+                <Marker coordinate={destinationLocation}>
+                    <View className="w-8 h-8 rounded-full bg-green-500 items-center justify-center">
+                        <Ionicons name="home" size={16} color="#FFF" />
+                    </View>
+                </Marker>
+            </MapView>
+
+            {/* Floating Header */}
+            <SafeAreaView edges={['top']}>
+                <View className="flex-row items-center justify-between px-5 py-4">
+                    <TouchableOpacity
+                        onPress={() => router.back()}
+                        className="w-12 h-12 rounded-full bg-white items-center justify-center shadow-lg"
+                    >
+                        <Ionicons name="chevron-back" size={24} color="#000" />
+                    </TouchableOpacity>
+
+                    <Text className="text-lg font-bold text-white">Order #{orderId}</Text>
+
+                    <TouchableOpacity className="w-12 h-12 rounded-full bg-white items-center justify-center shadow-lg">
+                        <Ionicons name="help-circle-outline" size={24} color="#000" />
+                    </TouchableOpacity>
                 </View>
+            </SafeAreaView>
+
+            {/* Zoom Button */}
+            <View className="absolute right-5 top-1/3">
+                <TouchableOpacity
+                    onPress={handleZoomIn}
+                    className="w-12 h-12 rounded-full bg-white items-center justify-center shadow-lg"
+                >
+                    <Ionicons name="add" size={28} color="#000" />
+                </TouchableOpacity>
             </View>
 
-            <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-                {/* Map Placeholder */}
-                <View
-                    className="mx-6 mt-6 h-64 bg-gray-100 rounded-[32px] overflow-hidden relative"
-                >
-                    {/* Map would go here - using placeholder for now */}
-                    <View className="flex-1 items-center justify-center">
-                        <Ionicons name="map" size={64} color="#D1D5DB" />
-                        <Text className="text-gray-400 mt-4 font-bold">Map View</Text>
-                        <Text className="text-gray-400 text-sm">Google Maps integration pending</Text>
-                    </View>
-
-                    {/* ETA Badge */}
-                    <View className="absolute top-4 left-4 bg-white rounded-full px-4 py-2 shadow-lg">
-                        <View className="flex-row items-center">
-                            <Ionicons name="time-outline" size={16} color="#FF5722" />
-                            <Text className="text-sm font-bold text-gray-900 ml-2">{estimatedTime}</Text>
+            {/* Bottom Panel */}
+            <View className="absolute bottom-0 left-0 right-0 bg-white rounded-t-[32px] pt-6 pb-8 px-6" style={{ maxHeight: height * 0.55 }}>
+                {/* Estimated Arrival */}
+                <View className="mb-6">
+                    <Text className="text-xs text-gray-500 uppercase tracking-wide mb-1">Estimated Arrival</Text>
+                    <View className="flex-row items-center justify-between">
+                        <Text className="text-4xl font-bold text-[#FF5722]">{estimatedTime}</Text>
+                        <View className="w-12 h-12 rounded-full bg-[#FF5722]/10 items-center justify-center">
+                            <Ionicons name="time-outline" size={24} color="#FF5722" />
                         </View>
                     </View>
                 </View>
 
-                {/* Order Status Timeline */}
-                <View className="px-6 py-6">
-                    <Text className="text-lg font-bold text-gray-900 mb-6">Order Status</Text>
-                    <View className="space-y-4">
-                        {orderSteps.map((step, index) => (
-                            <View key={step.status} className="flex-row items-center">
-                                {/* Icon */}
-                                <View
-                                    className={`w-12 h-12 rounded-full items-center justify-center ${step.completed ? 'bg-[#FF5722]' : 'bg-gray-100'
-                                        }`}
-                                >
-                                    <Ionicons
-                                        name={step.icon}
-                                        size={24}
-                                        color={step.completed ? '#FFFFFF' : '#9CA3AF'}
-                                    />
-                                </View>
-
-                                {/* Label */}
-                                <View className="flex-1 ml-4">
-                                    <Text
-                                        className={`text-base font-bold ${step.completed ? 'text-gray-900' : 'text-gray-400'
-                                            }`}
-                                    >
-                                        {step.label}
-                                    </Text>
-                                    {step.completed && currentStatus === step.status && (
-                                        <Text className="text-sm text-[#FF5722] mt-1">In progress...</Text>
-                                    )}
-                                </View>
-
-                                {/* Checkmark */}
-                                {step.completed && currentStatus !== step.status && (
-                                    <Ionicons name="checkmark-circle" size={24} color="#10B981" />
-                                )}
-
-                                {/* Connecting Line */}
-                                {index < orderSteps.length - 1 && (
-                                    <View
-                                        className={`absolute left-6 top-12 w-0.5 h-8 ${step.completed ? 'bg-[#FF5722]' : 'bg-gray-200'
-                                            }`}
-                                        style={{ marginLeft: -1 }}
-                                    />
-                                )}
+                {/* Status Timeline - Horizontal */}
+                <View className="mb-6">
+                    <View className="flex-row items-center justify-between mb-3">
+                        {/* Confirmed */}
+                        <View className="items-center flex-1">
+                            <View className={`w-12 h-12 rounded-full items-center justify-center ${currentStep >= 0 ? 'bg-[#FF5722]' : 'bg-gray-200'}`}>
+                                <Ionicons name="checkmark" size={24} color={currentStep >= 0 ? '#FFF' : '#9CA3AF'} />
                             </View>
-                        ))}
+                            <Text className={`text-xs mt-2 font-semibold ${currentStep >= 0 ? 'text-gray-900' : 'text-gray-400'}`}>
+                                CONFIRMED
+                            </Text>
+                        </View>
+
+                        {/* Line */}
+                        <View className={`flex-1 h-1 -mt-6 ${currentStep >= 1 ? 'bg-[#FF5722]' : 'bg-gray-200'}`} />
+
+                        {/* Preparing */}
+                        <View className="items-center flex-1">
+                            <View className={`w-12 h-12 rounded-full items-center justify-center ${currentStep >= 1 ? 'bg-[#FF5722]' : 'bg-gray-200'}`}>
+                                <Ionicons name="restaurant" size={20} color={currentStep >= 1 ? '#FFF' : '#9CA3AF'} />
+                            </View>
+                            <Text className={`text-xs mt-2 font-semibold ${currentStep >= 1 ? 'text-gray-900' : 'text-gray-400'}`}>
+                                PREPARING
+                            </Text>
+                        </View>
+
+                        {/* Line */}
+                        <View className={`flex-1 h-1 -mt-6 ${currentStep >= 2 ? 'bg-[#FF5722]' : 'bg-gray-200'}`} />
+
+                        {/* On the Way */}
+                        <View className="items-center flex-1">
+                            <View className={`w-12 h-12 rounded-full items-center justify-center ${currentStep >= 2 ? 'bg-[#FF5722]' : 'bg-gray-200'}`}>
+                                <Ionicons name="bicycle" size={24} color={currentStep >= 2 ? '#FFF' : '#9CA3AF'} />
+                            </View>
+                            <Text className={`text-xs mt-2 font-semibold ${currentStep >= 2 ? 'text-gray-900' : 'text-gray-400'}`}>
+                                ON THE WAY
+                            </Text>
+                        </View>
                     </View>
                 </View>
+
+                {/* Status Alert */}
+                {currentStatus === 'on_the_way' && (
+                    <View className="bg-[#FF5722]/10 rounded-2xl p-4 mb-6 flex-row items-center">
+                        <View className="w-8 h-8 rounded-full bg-[#FF5722]/20 items-center justify-center mr-3">
+                            <Ionicons name="information" size={18} color="#FF5722" />
+                        </View>
+                        <Text className="flex-1 text-sm text-[#FF5722] font-medium">
+                            Your courier is picking up speed!
+                        </Text>
+                    </View>
+                )}
 
                 {/* Courier Info */}
-                <View
-                    className="mx-6 mb-6 bg-gray-50 rounded-[32px] p-6"
-                >
-                    <Text className="text-lg font-bold text-gray-900 mb-4">Your Courier</Text>
-                    <View className="flex-row items-center">
+                <View className="flex-row items-center">
+                    <View className="relative mr-4">
                         <Image
                             source={{ uri: courier.avatar }}
-                            className="w-16 h-16 rounded-full mr-4"
+                            className="w-16 h-16 rounded-full"
                         />
-                        <View className="flex-1">
-                            <Text className="text-base font-bold text-gray-900">{courier.name}</Text>
-                            <View className="flex-row items-center mt-1">
-                                <Ionicons name="star" size={16} color="#FBBF24" />
-                                <Text className="text-sm text-gray-600 ml-1">{courier.rating}</Text>
-                            </View>
+                        {courier.isOnline && (
+                            <View className="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-green-500 border-2 border-white" />
+                        )}
+                    </View>
+
+                    <View className="flex-1">
+                        <Text className="text-base font-bold text-gray-900">{courier.name}</Text>
+                        <View className="flex-row items-center mt-1">
+                            <Ionicons name="car-sport-outline" size={14} color="#6B7280" />
+                            <Text className="text-xs text-gray-500 ml-1">{courier.licensePlate} •</Text>
+                            <Text className="text-xs text-gray-500 ml-1">{courier.vehicle}</Text>
                         </View>
-                        <View className="flex-row space-x-2">
-                            <TouchableOpacity className="w-12 h-12 rounded-full bg-[#FF5722] items-center justify-center">
-                                <Ionicons name="call" size={20} color="#FFFFFF" />
-                            </TouchableOpacity>
-                            <TouchableOpacity className="w-12 h-12 rounded-full bg-blue-500 items-center justify-center">
-                                <Ionicons name="chatbubble" size={20} color="#FFFFFF" />
-                            </TouchableOpacity>
-                        </View>
+                    </View>
+
+                    <View className="flex-row gap-2">
+                        <TouchableOpacity className="w-12 h-12 rounded-full bg-gray-900 items-center justify-center">
+                            <Ionicons name="chatbubble-outline" size={20} color="#FFF" />
+                        </TouchableOpacity>
+                        <TouchableOpacity className="w-12 h-12 rounded-full bg-[#FF5722] items-center justify-center">
+                            <Ionicons name="call" size={20} color="#FFF" />
+                        </TouchableOpacity>
                     </View>
                 </View>
 
-                {/* Order Details */}
-                <View className="px-6 pb-8">
-                    <Text className="text-lg font-bold text-gray-900 mb-4">Order Details</Text>
-                    <View className="bg-gray-50 rounded-[24px] p-4">
-                        <View className="flex-row justify-between mb-2">
-                            <Text className="text-sm text-gray-600">Restaurant</Text>
-                            <Text className="text-sm font-bold text-gray-900">Burger King</Text>
-                        </View>
-                        <View className="flex-row justify-between mb-2">
-                            <Text className="text-sm text-gray-600">Items</Text>
-                            <Text className="text-sm font-bold text-gray-900">3 items</Text>
-                        </View>
-                        <View className="flex-row justify-between">
-                            <Text className="text-sm text-gray-600">Total</Text>
-                            <Text className="text-sm font-bold text-[#FF5722]">S/ 45.90</Text>
-                        </View>
-                    </View>
-                </View>
-            </ScrollView>
-        </SafeAreaView>
+                {/* DEV: Test Button to Feedback */}
+                <TouchableOpacity
+                    onPress={() => router.push(`/order/feedback?id=${orderId}` as any)}
+                    className="mt-4 bg-green-500 py-3 rounded-2xl items-center"
+                >
+                    <Text className="text-white font-bold text-sm">🧪 Test: Go to Feedback</Text>
+                </TouchableOpacity>
+            </View>
+        </View>
     );
 }

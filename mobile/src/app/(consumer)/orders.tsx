@@ -58,9 +58,21 @@ export default function OrdersScreen() {
                 {/* Header */}
                 <View className="py-6 flex-row justify-between items-center">
                     <Text className="text-3xl font-black text-gray-900">My Orders</Text>
-                    <TouchableOpacity className="bg-gray-50 p-3 rounded-full border border-gray-100">
-                        <Ionicons name="filter-outline" size={20} color="#1F2937" />
-                    </TouchableOpacity>
+                    <View className="flex-row gap-2">
+                        {/* DEV: Test Buttons */}
+                        <TouchableOpacity
+                            onPress={() => router.push('/order/feedback?id=TEST-001' as any)}
+                            className="bg-blue-500 px-3 py-2 rounded-full"
+                        >
+                            <Text className="text-white font-bold text-xs">📝 Feedback</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={() => router.push('/order/feedback-confirmation' as any)}
+                            className="bg-green-500 px-3 py-2 rounded-full"
+                        >
+                            <Text className="text-white font-bold text-xs">✅ Confirm</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
 
                 {/* Tabs */}

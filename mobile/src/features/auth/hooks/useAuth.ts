@@ -7,7 +7,7 @@ export interface AuthStore {
     isAuthenticated: boolean;
     isLoading: boolean;
     error: string | null;
-    login: (credentials: LoginRequest) => Promise<void>;
+    login: (credentials: LoginRequest) => Promise<User>;
     register: (userData: RegisterRequest) => Promise<void>;
     logout: () => Promise<void>;
     checkAuth: () => Promise<void>;
@@ -21,7 +21,7 @@ export const useAuth = create((set: any): AuthStore => ({
     isLoading: false,
     error: null,
 
-    login: async (credentials: LoginRequest) => {
+    login: async (credentials: LoginRequest): Promise<User> => {
         set({ isLoading: true, error: null });
         try {
             // SIMULACION: Retraso de 1 segundo
@@ -34,12 +34,15 @@ export const useAuth = create((set: any): AuthStore => ({
             // Guardar tokens en SecureStore
             await tokenStorage.saveTokens(mockAccessToken, mockRefreshToken);
 
+            // Determinar rol basado en el email para pruebas
+            const role = credentials.email.toLowerCase().includes('courier') ? 'COURIER' : 'CONSUMER';
+
             // Usuario falso para pruebas
             const mockUser: User = {
                 id: 'user-123',
                 email: credentials.email,
-                name: 'Usuario Demo',
-                role: 'CONSUMER',
+                name: role === 'COURIER' ? 'Courier Demo' : 'Usuario Demo',
+                role: role as 'CONSUMER' | 'COURIER',
                 phone: '555-0123',
                 createdAt: new Date().toISOString()
             };
@@ -51,11 +54,14 @@ export const useAuth = create((set: any): AuthStore => ({
             });
             console.log('⚡ SIMULACION: Login exitoso para', credentials.email);
             console.log('⚡ Tokens guardados en SecureStore');
+
+            return mockUser;
         } catch (error) {
             set({
                 isLoading: false,
                 error: 'Error simulado (nunca debería pasar aquí)'
             });
+            throw error;
         }
     },
 

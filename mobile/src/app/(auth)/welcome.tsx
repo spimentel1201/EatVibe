@@ -25,9 +25,9 @@ export default function WelcomeScreen() {
                 </Text>
             </View>
 
-            <View className="w-full space-y-4 max-w-sm">
+            <View className="w-full max-w-sm">
                 <TouchableOpacity
-                    className="w-full bg-orange-500 py-4 rounded-2xl shadow-lg shadow-orange-300 active:bg-orange-600"
+                    className="w-full bg-orange-500 py-4 rounded-2xl shadow-lg shadow-orange-300 active:bg-orange-600 mb-4"
                     onPress={() => router.push('/(auth)/login')}
                 >
                     <Text className="text-white text-center font-bold text-lg">Log In</Text>

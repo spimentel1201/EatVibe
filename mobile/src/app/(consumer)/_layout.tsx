@@ -30,7 +30,7 @@ function TabBar() {
                 {tabs.map((tab) => {
                     const isActive = pathname === tab.path;
                     const color = isActive ? '#FF5722' : '#9CA3AF';
-                    
+
                     return (
                         <TouchableOpacity
                             key={tab.name}
@@ -38,19 +38,19 @@ function TabBar() {
                             className="flex-1 items-center justify-center"
                         >
                             <View className="relative">
-                                <Ionicons 
-                                    name={isActive ? tab.icon as any : tab.iconOutline as any} 
-                                    size={24} 
-                                    color={color} 
+                                <Ionicons
+                                    name={isActive ? tab.icon as any : tab.iconOutline as any}
+                                    size={24}
+                                    color={color}
                                 />
-                                {tab.badge && tab.badge > 0 && (
+                                {(tab.badge ?? 0) > 0 && (
                                     <View className="absolute -top-1 -right-2 bg-[#FF5722] rounded-full w-4 h-4 items-center justify-center">
                                         <Text className="text-white text-[10px] font-bold">{tab.badge}</Text>
                                     </View>
                                 )}
                             </View>
-                            <Text 
-                                className="text-[10px] font-extrabold uppercase mt-1" 
+                            <Text
+                                className="text-[10px] font-extrabold uppercase mt-1"
                                 style={{ color, letterSpacing: 0.5 }}
                             >
                                 {tab.label}

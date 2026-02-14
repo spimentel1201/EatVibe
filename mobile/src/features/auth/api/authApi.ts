@@ -67,7 +67,12 @@ export const authApi = {
 
             return { user, accessToken: token, refreshToken };
         } catch (error: any) {
-            console.error('Login error:', error);
+            console.error('Login error details:', {
+                status: error.response?.status,
+                data: error.response?.data,
+                headers: error.response?.headers,
+                message: error.message
+            });
             throw new Error(error.response?.data?.message || 'Login failed');
         }
     },

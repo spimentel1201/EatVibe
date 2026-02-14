@@ -48,29 +48,29 @@ El siguiente diagrama describe cómo el usuario interactúa con la aplicación d
 
 ```mermaid
 graph TD
-    A[🏠 Dashboard (Home)] -->|Go Online| B(Esperando Pedidos)
-    B -->|Nuevo Pedido| C{Incoming Order}
+    A["🏠 Dashboard (Home)"] -->|Go Online| B("Esperando Pedidos")
+    B -->|Nuevo Pedido| C{"Incoming Order"}
     C -->|Rechazar| B
-    C -->|Aceptar| D[📦 Order Details]
-    D --> E[🚀 Active Delivery]
+    C -->|Aceptar| D["📦 Order Details"]
+    D --> E["🚀 Active Delivery"]
     
-    subgraph Flujo de Entrega
-    E --> F[📍 Navegación al Restaurante]
-    F --> G[🍽️ Recogida (Pickup)]
-    G --> H[📍 Navegación al Cliente]
-    H --> I[🏠 Llegada al Cliente]
-    I --> J[📸 Proof of Delivery]
-    J --> K[✅ Delivery Completed]
+    subgraph "Flujo de Entrega"
+    E --> F["📍 Navegación al Restaurante"]
+    F --> G["🍽️ Recogida (Pickup)"]
+    G --> H["📍 Navegación al Cliente"]
+    H --> I["🏠 Llegada al Cliente"]
+    I --> J["📸 Proof of Delivery"]
+    J --> K["✅ Delivery Completed"]
     end
     
     K --> A
     
-    subgraph Gestión y Configuración
-    A --> L[💰 Earnings Hub]
-    L --> M[Cash Out]
-    A --> N[📜 Trip History]
-    A --> O[👤 Profile]
-    O --> P[Vehículos / Documentos]
+    subgraph "Gestión y Configuración"
+    A --> L["💰 Earnings Hub"]
+    L --> M["Cash Out"]
+    A --> N["📜 Trip History"]
+    A --> O["👤 Profile"]
+    O --> P["Vehículos / Documentos"]
     end
 ```
 

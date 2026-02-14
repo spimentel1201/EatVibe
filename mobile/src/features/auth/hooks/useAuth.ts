@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { tokenStorage } from '@/core/storage/tokenStorage';
 import { User, LoginRequest, RegisterRequest } from '../types';
+import { authApi } from '../api/authApi';
 
 export interface AuthStore {
     user: User | null;
@@ -14,7 +15,6 @@ export interface AuthStore {
     clearError: () => void;
 }
 
-// MOCK / SIMULATION MODE ENABLED
 export const useAuth = create((set: any): AuthStore => ({
     user: null,
     isAuthenticated: false,
@@ -24,42 +24,24 @@ export const useAuth = create((set: any): AuthStore => ({
     login: async (credentials: LoginRequest): Promise<User> => {
         set({ isLoading: true, error: null });
         try {
-            // SIMULACION: Retraso de 1 segundo
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            const { user, accessToken, refreshToken } = await authApi.login(credentials);
 
-            // Mock tokens (en producción vendrían del backend)
-            const mockAccessToken = 'mock_access_token_' + Date.now();
-            const mockRefreshToken = 'mock_refresh_token_' + Date.now();
-
-            // Guardar tokens en SecureStore
-            await tokenStorage.saveTokens(mockAccessToken, mockRefreshToken);
-
-            // Determinar rol basado en el email para pruebas
-            const role = credentials.email.toLowerCase().includes('courier') ? 'COURIER' : 'CONSUMER';
-
-            // Usuario falso para pruebas
-            const mockUser: User = {
-                id: 'user-123',
-                email: credentials.email,
-                name: role === 'COURIER' ? 'Courier Demo' : 'Usuario Demo',
-                role: role as 'CONSUMER' | 'COURIER',
-                phone: '555-0123',
-                createdAt: new Date().toISOString()
-            };
+            // Save tokens to secure storage
+            await tokenStorage.saveTokens(accessToken, refreshToken);
 
             set({
-                user: mockUser,
+                user,
                 isAuthenticated: true,
-                isLoading: false
+                isLoading: false,
             });
-            console.log('⚡ SIMULACION: Login exitoso para', credentials.email);
-            console.log('⚡ Tokens guardados en SecureStore');
 
-            return mockUser;
-        } catch (error) {
+            console.log('✅ Login successful for', user.email);
+            return user;
+        } catch (error: any) {
+            const errorMessage = error.message || 'Login failed';
             set({
                 isLoading: false,
-                error: 'Error simulado (nunca debería pasar aquí)'
+                error: errorMessage,
             });
             throw error;
         }
@@ -68,91 +50,86 @@ export const useAuth = create((set: any): AuthStore => ({
     register: async (userData: RegisterRequest) => {
         set({ isLoading: true, error: null });
         try {
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            const { user, accessToken, refreshToken } = await authApi.register(userData);
 
-            // Mock tokens
-            const mockAccessToken = 'mock_access_token_' + Date.now();
-            const mockRefreshToken = 'mock_refresh_token_' + Date.now();
-
-            // Guardar tokens
-            await tokenStorage.saveTokens(mockAccessToken, mockRefreshToken);
-
-            const mockUser: User = {
-                id: 'user-new-123',
-                email: userData.email,
-                name: userData.name,
-                role: 'CONSUMER',
-                phone: userData.phone,
-                createdAt: new Date().toISOString()
-            };
+            // Save tokens to secure storage
+            await tokenStorage.saveTokens(accessToken, refreshToken);
 
             set({
-                user: mockUser,
+                user,
                 isAuthenticated: true,
-                isLoading: false
+                isLoading: false,
             });
-            console.log('⚡ SIMULACION: Registro exitoso');
-            console.log('⚡ Tokens guardados en SecureStore');
-        } catch (error) {
+
+            console.log('✅ Registration successful for', user.email);
+        } catch (error: any) {
+            const errorMessage = error.message || 'Registration failed';
             set({
                 isLoading: false,
-                error: 'Error al registrar'
+                error: errorMessage,
             });
+            throw error;
         }
     },
 
     logout: async () => {
-        set({ isLoading: true });
+        set({ isLoading: true, error: null });
         try {
-            await new Promise(resolve => setTimeout(resolve, 500));
+            // Call logout API (currently no-op in backend)
+            await authApi.logout();
 
-            // Limpiar tokens del SecureStore
+            // Clear tokens from secure storage
             await tokenStorage.clearTokens();
 
-            set({ user: null, isAuthenticated: false, isLoading: false, error: null });
-            console.log('⚡ SIMULACION: Logout exitoso');
-            console.log('⚡ Tokens eliminados de SecureStore');
-        } catch (error) {
-            set({ isLoading: false });
+            set({
+                user: null,
+                isAuthenticated: false,
+                isLoading: false,
+            });
+
+            console.log('✅ Logout successful');
+        } catch (error: any) {
+            const errorMessage = error.message || 'Logout failed';
+            set({
+                isLoading: false,
+                error: errorMessage,
+            });
+            throw error;
         }
     },
 
     checkAuth: async () => {
-        console.log('🔐 checkAuth: Iniciando verificación...');
-        set({ isLoading: true });
-
+        set({ isLoading: true, error: null });
         try {
-            // Como estamos usando memoria, esto debería ser instantáneo
-            const hasTokens = await tokenStorage.hasTokens();
-            console.log('🔐 checkAuth: Tokens encontrados?', hasTokens);
+            const accessToken = await tokenStorage.getAccessToken();
 
-            if (hasTokens) {
-                // En simulación, restaurar usuario mock si hay tokens
-                const mockUser: User = {
-                    id: 'user-123',
-                    email: 'demo@eatvibe.com',
-                    name: 'Usuario Demo',
-                    role: 'CONSUMER',
-                    phone: '555-0123',
-                    createdAt: new Date().toISOString()
-                };
-
+            if (!accessToken) {
                 set({
-                    user: mockUser,
-                    isAuthenticated: true,
-                    isLoading: false
+                    user: null,
+                    isAuthenticated: false,
+                    isLoading: false,
                 });
-                console.log('⚡ SIMULACION: Sesión restaurada desde tokens');
-            } else {
-                set({ user: null, isAuthenticated: false, isLoading: false });
-                console.log('⚡ SIMULACION: No hay tokens, usuario no autenticado');
+                return;
             }
-        } catch (error) {
-            console.error('🔐 checkAuth ERROR:', error);
-            // En caso de error, asumimos logout para no bloquear la app
-            set({ user: null, isAuthenticated: false, isLoading: false });
+
+            // TODO: Add /me endpoint to backend to get current user
+            // For now, we'll just check if token exists
+            // In production, decode JWT or call /me endpoint
+            set({
+                isAuthenticated: true,
+                isLoading: false,
+            });
+        } catch (error: any) {
+            set({
+                user: null,
+                isAuthenticated: false,
+                isLoading: false,
+                error: error.message || 'Auth check failed',
+            });
         }
     },
 
-    clearError: () => set({ error: null }),
+    clearError: () => {
+        set({ error: null });
+    },
 }));

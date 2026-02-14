@@ -30,13 +30,17 @@ export interface SocialLoginRequest {
 // Auth response types
 export interface AuthResponse {
     user: User;
-    accessToken: string;
+    token: string; // Backend returns 'token' not 'accessToken'
     refreshToken: string;
+    type: string; // e.g., 'Bearer'
+    role: string; // User role from backend
 }
 
 export interface RefreshTokenResponse {
-    accessToken: string;
+    token: string; // Backend returns 'token' not 'accessToken'
     refreshToken?: string;
+    type: string;
+    role: string;
 }
 
 // Auth state

@@ -1,87 +1,65 @@
-import { AuthResponse, LoginRequest, RegisterRequest, User } from '../types';
+import { apiClient } from '../../../core/api/client';
+import { AuthResponse, LoginRequest, RegisterRequest, User, UserRole } from '../types';
 
-// Mock user data
-const mockUser: User = {
-    id: '1',
-    email: 'user@foodrush.com',
-    name: 'Usuario Demo',
-    phone: '+51999999999',
-    avatar: 'https://i.pravatar.cc/150?img=1',
-    role: 'CONSUMER',
-    createdAt: new Date().toISOString(),
-};
+export const authApi = {
+    /**
+     * Login user with email and password
+     */
+    login: async (
+        credentials: LoginRequest
+    ): Promise<{ user: User; accessToken: string; refreshToken: string }> => {
+        try {
+            const response = await apiClient.post('/auth/login', credentials);
+            const { token, refreshToken, role } = response.data;
 
-// Mock tokens
-const mockAccessToken =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZW1haWwiOiJ1c2VyQGZvb2RydXNoLmNvbSIsInJvbGUiOiJDT05TVU1FUiIsImlhdCI6MTUxNjIzOTAyMn0.mock';
-const mockRefreshToken = 'mock_refresh_token_12345';
+            // Backend doesn't return full user object, construct it from response
+            // TODO: Add endpoint to get user profile or decode from JWT
+            const user: User = {
+                id: '', // Will be populated from JWT decode or separate /me endpoint
+                email: credentials.email,
+                name: '',
+                role: role as UserRole,
+            };
 
-/**
- * Login with email and password
- * TODO: Replace with actual API call when backend is ready
- */
-export const login = async (credentials: LoginRequest): Promise<AuthResponse> => {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
+            return { user, accessToken: token, refreshToken };
+        } catch (error: any) {
+            console.error('Login error:', error);
+            throw new Error(error.response?.data?.message || 'Login failed');
+        }
+    },
 
-    // Mock validation
-    if (credentials.email === 'user@foodrush.com' && credentials.password === 'password') {
-        return {
-            user: mockUser,
-            accessToken: mockAccessToken,
-            refreshToken: mockRefreshToken,
-        };
-    }
+    /**
+     * Register a new user
+     */
+    register: async (
+        data: RegisterRequest
+    ): Promise<{ user: User; accessToken: string; refreshToken: string }> => {
+        try {
+            const response = await apiClient.post('/auth/register', data);
+            const { token, refreshToken, role } = response.data;
 
-    throw new Error('Credenciales inválidas');
-};
+            const user: User = {
+                id: '',
+                email: data.email,
+                name: data.name,
+                phone: data.phone,
+                role: role as UserRole,
+            };
 
-/**
- * Register a new user
- * TODO: Replace with actual API call when backend is ready
- */
-export const register = async (userData: RegisterRequest): Promise<AuthResponse> => {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
+            return { user, accessToken: token, refreshToken };
+        } catch (error: any) {
+            console.error('Registration error:', error);
+            throw new Error(error.response?.data?.message || 'Registration failed');
+        }
+    },
 
-    // Mock validation
-    if (userData.email && userData.password && userData.name) {
-        const newUser: User = {
-            id: Math.random().toString(36).substring(7),
-            email: userData.email,
-            name: userData.name,
-            phone: userData.phone,
-            role: 'CONSUMER',
-            createdAt: new Date().toISOString(),
-        };
-
-        return {
-            user: newUser,
-            accessToken: mockAccessToken,
-            refreshToken: mockRefreshToken,
-        };
-    }
-
-    throw new Error('Datos de registro inválidos');
-};
-
-/**
- * Logout user
- * TODO: Add backend call to invalidate token when ready
- */
-export const logout = async (): Promise<void> => {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-    // In production, call backend to invalidate token
-    // await apiClient.post('/auth/logout');
-};
-
-/**
- * Get current user profile
- * TODO: Replace with actual API call when backend is ready
- */
-export const getCurrentUser = async (): Promise<User> => {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-    return mockUser;
+    /**
+     * Logout user
+     * Note: Backend doesn't have a logout endpoint, just clear local tokens
+     */
+    logout: async (): Promise<void> => {
+        // No backend call needed, just clear local storage
+        // The useAuth hook will handle clearing tokens
+        return Promise.resolve();
+    },
 };

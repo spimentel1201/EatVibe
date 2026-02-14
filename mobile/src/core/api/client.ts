@@ -87,21 +87,23 @@ apiClient.interceptors.response.use(
                 }
 
                 // Attempt to refresh the access token
-                const response = await axios.post(`${API_BASE_URL}/auth/refresh`, {
+                // Auth service doesn't have /api/v1 prefix, so construct URL differently
+                const authUrl = API_BASE_URL.replace('/api/v1', '/auth/refresh-token');
+                const response = await axios.post(authUrl, {
                     refreshToken,
                 });
 
-                const { accessToken, refreshToken: newRefreshToken } = response.data;
+                const { token, refreshToken: newRefreshToken } = response.data;
 
                 // Save new tokens
-                await tokenStorage.saveTokens(accessToken, newRefreshToken || refreshToken);
+                await tokenStorage.saveTokens(token, newRefreshToken || refreshToken);
 
                 // Process queued requests
-                processQueue(null, accessToken);
+                processQueue(null, token);
 
                 // Retry the original request with new token
                 if (originalRequest.headers) {
-                    originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+                    originalRequest.headers.Authorization = `Bearer ${token}`;
                 }
 
                 return apiClient(originalRequest);
@@ -120,3 +122,4 @@ apiClient.interceptors.response.use(
 );
 
 export default apiClient;
+export { apiClient };

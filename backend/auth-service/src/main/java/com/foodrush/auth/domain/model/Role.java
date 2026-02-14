@@ -1,8 +1,8 @@
 package com.foodrush.auth.domain.model;
 
 public enum Role {
-    CUSTOMER,
-    COURIER,
-    RESTAURANT_ADMIN,
-    ADMIN
+    ROLE_CUSTOMER,
+    ROLE_COURIER,
+    ROLE_RESTAURANT_ADMIN,
+    ROLE_ADMIN
 }

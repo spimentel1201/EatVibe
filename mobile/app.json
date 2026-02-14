@@ -18,7 +18,9 @@
       "bundleIdentifier": "com.foodrush.app",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "FoodRush necesita tu ubicación para mostrarte restaurantes cercanos.",
-        "NSLocationAlwaysAndWhenInUseUsageDescription": "FoodRush necesita tu ubicación para mostrarte restaurantes cercanos y rastrear entregas."
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "FoodRush necesita tu ubicación para mostrarte restaurantes cercanos y rastrear entregas.",
+        "NSCameraUsageDescription": "FoodRush necesita acceso a la cámara para tomar fotos de tu licencia de conducir y placa del vehículo.",
+        "NSPhotoLibraryUsageDescription": "FoodRush necesita acceso a tu galería para seleccionar fotos de tu licencia de conducir."
       }
     },
     "android": {
@@ -29,7 +31,10 @@
       "package": "com.foodrush.app",
       "permissions": [
         "ACCESS_COARSE_LOCATION",
-        "ACCESS_FINE_LOCATION"
+        "ACCESS_FINE_LOCATION",
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
       ],
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false

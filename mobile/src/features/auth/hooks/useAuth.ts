@@ -112,10 +112,13 @@ export const useAuth = create((set: any): AuthStore => ({
     },
 
     checkAuth: async () => {
+        console.log('🔐 checkAuth: Iniciando verificación...');
         set({ isLoading: true });
+
         try {
-            // Verificar si hay tokens guardados
+            // Como estamos usando memoria, esto debería ser instantáneo
             const hasTokens = await tokenStorage.hasTokens();
+            console.log('🔐 checkAuth: Tokens encontrados?', hasTokens);
 
             if (hasTokens) {
                 // En simulación, restaurar usuario mock si hay tokens
@@ -139,8 +142,9 @@ export const useAuth = create((set: any): AuthStore => ({
                 console.log('⚡ SIMULACION: No hay tokens, usuario no autenticado');
             }
         } catch (error) {
+            console.error('🔐 checkAuth ERROR:', error);
+            // En caso de error, asumimos logout para no bloquear la app
             set({ user: null, isAuthenticated: false, isLoading: false });
-            console.log('⚡ SIMULACION: Error al verificar auth');
         }
     },
 

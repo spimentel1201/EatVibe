@@ -63,7 +63,10 @@ export default function RegisterScreen() {
 
         try {
             await register({ name, email, password, phone: phone || undefined });
-            router.replace('/(consumer)');
+            // Small delay to ensure state updates before navigation
+            setTimeout(() => {
+                router.replace('/(consumer)/home');
+            }, 100);
         } catch (err) {
             console.error('Register error:', err);
         }

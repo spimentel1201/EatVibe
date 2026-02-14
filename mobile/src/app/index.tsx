@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Redirect } from 'expo-router';
 import { useAuth } from '@/features/auth/hooks/useAuth';
@@ -13,7 +12,7 @@ export default function Index() {
 
     // Redirect based on authentication status
     if (isAuthenticated) {
-        return <Redirect href="/(consumer)" />;
+        return <Redirect href="/(consumer)/home" />;
     }
 
     return <Redirect href="/(auth)/welcome" />;

@@ -2,7 +2,7 @@ import '../global.css';
 import { Stack } from 'expo-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useEffect } from 'react';
-import { useAuth } from '@/features/auth/hooks/useAuth';
+import { useAuth, AuthStore } from '@/features/auth/hooks/useAuth';
 import React from 'react';
 
 // Create a client
@@ -17,11 +17,12 @@ const queryClient = new QueryClient({
 });
 
 export default function RootLayout() {
-    const checkAuth = useAuth((state: any) => state.checkAuth);
+    const checkAuth = useAuth((state: AuthStore) => state.checkAuth);
 
     useEffect(() => {
-        // Check authentication status on app load
-        checkAuth();
+        // Check authentication status on app load (non-blocking)
+        checkAuth().catch(console.error);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
 
@@ -32,10 +33,7 @@ export default function RootLayout() {
                     headerShown: false,
                     contentStyle: { backgroundColor: '#FFFFFF' },
                 }}
-            >
-                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-                <Stack.Screen name="(consumer)" options={{ headerShown: false }} />
-            </Stack>
+            />
         </QueryClientProvider>
     );
 }

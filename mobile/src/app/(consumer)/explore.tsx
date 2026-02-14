@@ -65,7 +65,9 @@ export default function ExploreScreen() {
                             <Text className="text-white font-black text-lg">Unlock 50% Off!</Text>
                             <Text className="text-orange-100 text-sm mt-1">On your favorite gourmet burgers</Text>
                         </View>
-                        <Ionicons name="sparkles" size={40} color="rgba(255,255,255,0.3)" className="absolute right-4" />
+                        <View className="absolute right-4">
+                            <Ionicons name="sparkles" size={40} color="rgba(255,255,255,0.3)" />
+                        </View>
                     </TouchableOpacity>
                 </View>
             </ScrollView>

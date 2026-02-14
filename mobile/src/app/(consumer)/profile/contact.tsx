@@ -3,7 +3,6 @@ import { View, Text, ScrollView, TouchableOpacity, TextInput } from 'react-nativ
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, { FadeInDown } from 'react-native-reanimated';
 
 export default function ContactUsScreen() {
     const router = useRouter();
@@ -40,7 +39,7 @@ export default function ContactUsScreen() {
             </View>
 
             <ScrollView className="flex-1 px-6 pt-6" showsVerticalScrollIndicator={false}>
-                <Animated.View entering={FadeInDown.duration(400)} className="space-y-6">
+                <View className="space-y-6">
                     <View>
                         <Text className="text-gray-500 font-bold mb-2 ml-1">Subject</Text>
                         <TextInput
@@ -63,7 +62,7 @@ export default function ContactUsScreen() {
                             className="bg-gray-50 rounded-2xl px-4 py-4 border border-gray-100 text-gray-900 font-bold text-base min-h-[150px]"
                         />
                     </View>
-                </Animated.View>
+                </View>
 
                 {/* Contact Options */}
                 <View className="mt-8 space-y-4">
@@ -71,22 +70,26 @@ export default function ContactUsScreen() {
                         <View className="w-10 h-10 rounded-full bg-blue-100 items-center justify-center mr-4">
                             <Ionicons name="call" size={20} color="#3B82F6" />
                         </View>
-                        <View>
+                        <View className="flex-1">
                             <Text className="text-gray-900 font-bold text-base">Call Support</Text>
                             <Text className="text-gray-500 text-sm">Wait time: ~2 min</Text>
                         </View>
-                        <Ionicons name="chevron-forward" size={20} color="#9CA3AF" className="ml-auto" />
+                        <View className="ml-auto">
+                            <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+                        </View>
                     </TouchableOpacity>
 
                     <TouchableOpacity className="flex-row items-center bg-green-50 p-4 rounded-2xl">
                         <View className="w-10 h-10 rounded-full bg-green-100 items-center justify-center mr-4">
                             <Ionicons name="logo-whatsapp" size={20} color="#10B981" />
                         </View>
-                        <View>
+                        <View className="flex-1">
                             <Text className="text-gray-900 font-bold text-base">WhatsApp</Text>
                             <Text className="text-gray-500 text-sm">Online now</Text>
                         </View>
-                        <Ionicons name="chevron-forward" size={20} color="#9CA3AF" className="ml-auto" />
+                        <View className="ml-auto">
+                            <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+                        </View>
                     </TouchableOpacity>
                 </View>
             </ScrollView>
@@ -103,7 +106,9 @@ export default function ContactUsScreen() {
                         <Text className="text-white font-black text-lg">Sending...</Text>
                     ) : (
                         <>
-                            <Ionicons name="send" size={20} color="white" className="mr-2" />
+                            <View className="mr-2">
+                                <Ionicons name="send" size={20} color="white" />
+                            </View>
                             <Text className="text-white font-black text-lg">Send Message</Text>
                         </>
                     )}

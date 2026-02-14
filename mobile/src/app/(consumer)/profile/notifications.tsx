@@ -3,7 +3,6 @@ import { View, Text, Switch, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, { FadeInDown } from 'react-native-reanimated';
 
 export default function NotificationSettingsScreen() {
     const router = useRouter();
@@ -34,7 +33,7 @@ export default function NotificationSettingsScreen() {
             </View>
 
             <ScrollView className="flex-1 px-6 pt-6" showsVerticalScrollIndicator={false}>
-                <Animated.View entering={FadeInDown.duration(400)} className="space-y-8">
+                <View className="space-y-8">
 
                     {/* General Section */}
                     <View>
@@ -123,7 +122,7 @@ export default function NotificationSettingsScreen() {
                         </View>
                     </View>
 
-                </Animated.View>
+                </View>
             </ScrollView>
         </SafeAreaView>
     );

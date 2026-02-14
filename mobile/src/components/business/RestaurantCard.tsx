@@ -1,16 +1,7 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity } from 'react-native';
-import Animated, {
-    useAnimatedStyle,
-    useSharedValue,
-    withSpring,
-    FadeIn,
-} from 'react-native-reanimated';
 import { Restaurant } from '@/features/restaurant/types';
 import { Card } from '../ui/Card';
-import { ANIMATION_SCALE, SPRING_CONFIG, ANIMATION_DURATION } from '@/core/animations/constants';
-
-const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
 interface RestaurantCardProps {
     restaurant: Restaurant;
@@ -18,29 +9,11 @@ interface RestaurantCardProps {
     index?: number;
 }
 
-export const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant, onPress, index = 0 }) => {
-    const scale = useSharedValue(1);
-
-    const animatedStyle = useAnimatedStyle(() => ({
-        transform: [{ scale: scale.value }],
-    }));
-
-    const handlePressIn = () => {
-        scale.value = withSpring(ANIMATION_SCALE.PRESS, SPRING_CONFIG.GENTLE);
-    };
-
-    const handlePressOut = () => {
-        scale.value = withSpring(ANIMATION_SCALE.NORMAL, SPRING_CONFIG.GENTLE);
-    };
-
+export const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant, onPress }) => {
     return (
-        <AnimatedTouchable
+        <TouchableOpacity
             onPress={onPress}
-            onPressIn={handlePressIn}
-            onPressOut={handlePressOut}
             activeOpacity={0.8}
-            style={animatedStyle}
-            entering={FadeIn.delay(index * 50).duration(ANIMATION_DURATION.NORMAL)}
         >
             <Card className="mb-4 overflow-hidden">
                 {/* Restaurant Image */}
@@ -102,6 +75,6 @@ export const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant, onPr
                     )}
                 </View>
             </Card>
-        </AnimatedTouchable>
+        </TouchableOpacity>
     );
 };

@@ -3,7 +3,6 @@ import { View, Text, ScrollView, TouchableOpacity, TextInput } from 'react-nativ
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, { FadeInDown, ZoomIn } from 'react-native-reanimated';
 
 type RatingCategory = 'restaurant' | 'courier';
 
@@ -85,13 +84,13 @@ export default function OrderFeedbackScreen() {
                         onPress={() => handleStarPress(category, star)}
                         className="p-2"
                     >
-                        <Animated.View entering={ZoomIn.delay(star * 50).duration(300)}>
+                        <View>
                             <Ionicons
                                 name={star <= currentRating ? 'star' : 'star-outline'}
                                 size={40}
                                 color={star <= currentRating ? '#FBBF24' : '#D1D5DB'}
                             />
-                        </Animated.View>
+                        </View>
                     </TouchableOpacity>
                 ))}
             </View>
@@ -104,12 +103,11 @@ export default function OrderFeedbackScreen() {
 
         return (
             <View className="flex-row flex-wrap gap-2 mt-4">
-                {tags.map((tag, index) => {
+                {tags.map((tag, _index) => {
                     const isSelected = selectedTags.includes(tag.id);
                     return (
-                        <Animated.View
+                        <View
                             key={tag.id}
-                            entering={FadeInDown.delay(index * 50).duration(300)}
                         >
                             <TouchableOpacity
                                 onPress={() => toggleTag(category, tag.id)}
@@ -124,7 +122,7 @@ export default function OrderFeedbackScreen() {
                                     {tag.label}
                                 </Text>
                             </TouchableOpacity>
-                        </Animated.View>
+                        </View>
                     );
                 })}
             </View>
@@ -149,8 +147,7 @@ export default function OrderFeedbackScreen() {
 
             <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
                 {/* Restaurant Rating */}
-                <Animated.View
-                    entering={FadeInDown.duration(400)}
+                <View
                     className="px-6 py-6 border-b border-gray-100"
                 >
                     <View className="items-center">
@@ -162,11 +159,10 @@ export default function OrderFeedbackScreen() {
                     </View>
                     {renderStars('restaurant', restaurantRating)}
                     {restaurantRating > 0 && renderTags('restaurant')}
-                </Animated.View>
+                </View>
 
                 {/* Courier Rating */}
-                <Animated.View
-                    entering={FadeInDown.delay(200).duration(400)}
+                <View
                     className="px-6 py-6 border-b border-gray-100"
                 >
                     <View className="items-center">
@@ -178,11 +174,10 @@ export default function OrderFeedbackScreen() {
                     </View>
                     {renderStars('courier', courierRating)}
                     {courierRating > 0 && renderTags('courier')}
-                </Animated.View>
+                </View>
 
                 {/* Comment Section */}
-                <Animated.View
-                    entering={FadeInDown.delay(400).duration(400)}
+                <View
                     className="px-6 py-6"
                 >
                     <Text className="text-lg font-bold text-gray-900 mb-3">
@@ -199,7 +194,7 @@ export default function OrderFeedbackScreen() {
                         className="bg-gray-50 rounded-[24px] p-4 text-base text-gray-900 min-h-[120px]"
                         style={{ fontFamily: 'System' }}
                     />
-                </Animated.View>
+                </View>
 
                 {/* Spacing for button */}
                 <View className="h-32" />

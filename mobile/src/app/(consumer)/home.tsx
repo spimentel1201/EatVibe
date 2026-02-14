@@ -13,7 +13,7 @@ const CATEGORIES = [
 
 const RESTAURANTS = [
     {
-        id: 1,
+        id: '1',
         name: "Burger House",
         rating: 4.8,
         tags: ["$$", "American", "Fast Food"],
@@ -24,7 +24,7 @@ const RESTAURANTS = [
         closed: false
     },
     {
-        id: 2,
+        id: '2',
         name: "Sushi Zen",
         rating: 4.5,
         tags: ["$$$", "Japanese", "Healthy"],
@@ -35,7 +35,7 @@ const RESTAURANTS = [
         closed: true
     },
     {
-        id: 3,
+        id: '3',
         name: "Green Garden Bowl",
         rating: 4.9,
         tags: ["$$", "Salads", "Mediterranean"],
@@ -97,7 +97,9 @@ export default function HomeScreen() {
                             <Text className="font-bold text-lg ml-2 text-gray-800" numberOfLines={1}>
                                 {isLocationLoading ? 'Locating...' : (address || 'Select Location')}
                             </Text>
-                            <Ionicons name="chevron-down" size={18} color="#FF5722" className="ml-1" />
+                            <View className="ml-1">
+                                <Ionicons name="chevron-down" size={18} color="#FF5722" />
+                            </View>
                         </TouchableOpacity>
                         <Text className="text-gray-400 text-sm ml-7 mt-0.5 font-medium">Delivering to your door</Text>
                     </View>
@@ -187,8 +189,7 @@ export default function HomeScreen() {
                             className="bg-white rounded-[28px] shadow-sm shadow-gray-200/50 mb-4 overflow-hidden border border-gray-100"
                             onPress={() => {
                                 console.log(`Navigating to restaurant ${rest.id}`);
-                                // Try absolute path
-                                router.push('/restaurant-detail' as any);
+                                router.push(`/restaurant-detail?id=${rest.id}` as any);
                             }}
                         >
                             {/* IMAGE SECTION */}

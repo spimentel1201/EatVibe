@@ -3,7 +3,6 @@ import { View, Text, ScrollView, TouchableOpacity, TextInput, LayoutAnimation, U
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, { FadeInDown } from 'react-native-reanimated';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
     UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -70,7 +69,9 @@ export default function HelpCenterScreen() {
 
                 {/* Search Bar */}
                 <View className="bg-gray-50 rounded-2xl px-4 py-3 flex-row items-center">
-                    <Ionicons name="search" size={20} color="#9CA3AF" className="mr-3" />
+                    <View className="mr-3">
+                        <Ionicons name="search" size={20} color="#9CA3AF" />
+                    </View>
                     <TextInput
                         value={searchQuery}
                         onChangeText={setSearchQuery}
@@ -110,9 +111,9 @@ export default function HelpCenterScreen() {
                                         />
                                     </View>
                                     {isExpanded && (
-                                        <Animated.View entering={FadeInDown.duration(200)}>
+                                        <View>
                                             <Text className="text-gray-600 mt-3 leading-6">{faq.answer}</Text>
-                                        </Animated.View>
+                                        </View>
                                     )}
                                 </TouchableOpacity>
                             );

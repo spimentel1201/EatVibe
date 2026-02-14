@@ -3,7 +3,6 @@ import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, { FadeInDown } from 'react-native-reanimated';
 
 export default function LegalScreen() {
     const router = useRouter();
@@ -73,13 +72,13 @@ export default function LegalScreen() {
             </View>
 
             <ScrollView className="flex-1 px-6 pt-6" showsVerticalScrollIndicator={false}>
-                <Animated.View entering={FadeInDown.duration(400)} className="pb-12">
+                <View className="pb-12">
                     {content}
 
                     <Text className="text-gray-400 text-sm mt-8 text-center">
                         Last updated: Feb 12, 2026
                     </Text>
-                </Animated.View>
+                </View>
             </ScrollView>
         </SafeAreaView>
     );

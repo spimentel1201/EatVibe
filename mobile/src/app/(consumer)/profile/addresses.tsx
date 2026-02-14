@@ -3,7 +3,6 @@ import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, { FadeInDown } from 'react-native-reanimated';
 
 // Mock addresses
 const MOCK_ADDRESSES = [
@@ -60,10 +59,9 @@ export default function AddressesScreen() {
                     </View>
                 ) : (
                     <View className="space-y-4">
-                        {addresses.map((addr, index) => (
-                            <Animated.View
+                        {addresses.map((addr) => (
+                            <View
                                 key={addr.id}
-                                entering={FadeInDown.delay(index * 100).duration(400)}
                                 className="bg-gray-50 rounded-[24px] p-5 border border-gray-100 flex-row items-center justify-between"
                             >
                                 <View className="flex-row items-center flex-1">
@@ -90,7 +88,7 @@ export default function AddressesScreen() {
                                 >
                                     <Ionicons name="trash-outline" size={20} color="#EF4444" />
                                 </TouchableOpacity>
-                            </Animated.View>
+                            </View>
                         ))}
                     </View>
                 )}
@@ -102,7 +100,9 @@ export default function AddressesScreen() {
                     onPress={handleAddAddress}
                     className="bg-[#FF5722] h-14 rounded-full items-center justify-center shadow-lg shadow-orange-500/30 flex-row"
                 >
-                    <Ionicons name="add" size={24} color="white" className="mr-2" />
+                    <View className="mr-2">
+                        <Ionicons name="add" size={24} color="white" />
+                    </View>
                     <Text className="text-white font-black text-lg">Add New Address</Text>
                 </TouchableOpacity>
             </View>

@@ -1,12 +1,5 @@
 import React, { useState } from 'react';
-import {
-    View,
-    Text,
-    Image,
-    TouchableOpacity,
-    Animated,
-} from 'react-native';
-
+import { View, Text, Image, TouchableOpacity, ScrollView } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRestaurantDetail } from '@/features/restaurant/hooks/useRestaurantDetail';
@@ -14,13 +7,11 @@ import { MenuItemCard, ProductCustomizationModal } from '@/components/business';
 import { LoadingSpinner } from '@/components/ui';
 import { MenuItem } from '@/features/restaurant/types';
 import { Ionicons } from '@expo/vector-icons';
-
 import { useCartStore } from '@/features/cart/store/useCartStore';
 
 export default function RestaurantDetailScreen() {
     const { id } = useLocalSearchParams<{ id: string }>();
     const router = useRouter();
-    const scrollY = React.useRef(new Animated.Value(0)).current;
     const addItem = useCartStore((state: any) => state.addItem);
 
     const { restaurant, menu, isLoading, error } = useRestaurantDetail(id);
@@ -34,7 +25,6 @@ export default function RestaurantDetailScreen() {
 
     const handleAddToCart = (quantity: number, selectedModifiers: any) => {
         if (selectedItem) {
-            // TODO: In the future, pass selectedModifiers to addItem for customization tracking
             addItem(selectedItem, quantity);
             setModalVisible(false);
             console.log('Added to cart with modifiers:', selectedModifiers);
@@ -64,60 +54,24 @@ export default function RestaurantDetailScreen() {
         );
     }
 
-    // Animated header background opacity
-    const headerBgOpacity = scrollY.interpolate({
-        inputRange: [0, 150],
-        outputRange: [0, 1],
-        extrapolate: 'clamp',
-    });
-
-    // Animated header icon background color
-    const iconBtnBg = scrollY.interpolate({
-        inputRange: [0, 150],
-        outputRange: ['rgba(255,255,255,0.9)', 'rgba(255,255,255,0)'],
-        extrapolate: 'clamp',
-    });
-
-
     return (
         <View className="flex-1 bg-white">
-            {/* Animated Header */}
-            <Animated.View
-                className="absolute top-0 left-0 right-0 z-10 bg-white shadow-sm shadow-gray-200"
-                style={{ opacity: headerBgOpacity }}
-            >
-                <SafeAreaView edges={['top']}>
-                    <View className="flex-row items-center h-14 px-4">
-                        <View className="w-10" /> {/* Placeholder for alignment */}
-                        <Text className="text-lg font-black text-gray-900 flex-1 text-center" numberOfLines={1}>
-                            {restaurant.name}
-                        </Text>
-                        <TouchableOpacity className="w-10 h-10 items-center justify-center">
-                            <Ionicons name="search-outline" size={24} color="#1F2937" />
-                        </TouchableOpacity>
-                    </View>
-                </SafeAreaView>
-            </Animated.View>
-
-            {/* Back Button (Independent of header for better control) */}
-            <SafeAreaView edges={['top']} className="absolute top-0 left-4 z-20">
-                <Animated.View
-                    style={{ backgroundColor: iconBtnBg }}
-                    className="w-10 h-10 rounded-full items-center justify-center border border-gray-100/50"
-                >
-                    <TouchableOpacity onPress={() => router.back()}>
+            {/* Header */}
+            <SafeAreaView edges={['top']} className="bg-white border-b border-gray-100">
+                <View className="flex-row items-center h-14 px-4">
+                    <TouchableOpacity onPress={() => router.back()} className="w-10 h-10 items-center justify-center">
                         <Ionicons name="chevron-back" size={24} color="#1F2937" />
                     </TouchableOpacity>
-                </Animated.View>
+                    <Text className="text-lg font-black text-gray-900 flex-1 text-center" numberOfLines={1}>
+                        {restaurant.name}
+                    </Text>
+                    <TouchableOpacity className="w-10 h-10 items-center justify-center">
+                        <Ionicons name="search-outline" size={24} color="#1F2937" />
+                    </TouchableOpacity>
+                </View>
             </SafeAreaView>
 
-            <Animated.ScrollView
-                onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
-                    useNativeDriver: false,
-                })}
-                scrollEventThrottle={16}
-                showsVerticalScrollIndicator={false}
-            >
+            <ScrollView showsVerticalScrollIndicator={false}>
                 {/* Hero section */}
                 <View className="relative">
                     <Image
@@ -125,8 +79,6 @@ export default function RestaurantDetailScreen() {
                         className="w-full h-80"
                         resizeMode="cover"
                     />
-
-                    {/* Status Badge */}
                     {!restaurant.isOpen && (
                         <View className="absolute top-1/2 left-1/2 -ml-12 -mt-6 bg-black/60 px-6 py-3 rounded-full border border-white/20">
                             <Text className="text-white font-black text-sm uppercase tracking-widest">Closed</Text>
@@ -134,7 +86,7 @@ export default function RestaurantDetailScreen() {
                     )}
                 </View>
 
-                {/* Restaurant Card (Overlapping) */}
+                {/* Restaurant Info */}
                 <View className="bg-white rounded-t-[40px] -mt-10 px-6 pt-8 pb-4">
                     <View className="flex-row justify-between items-start mb-4">
                         <View className="flex-1 mr-4">
@@ -196,9 +148,8 @@ export default function RestaurantDetailScreen() {
                     )}
                 </View>
 
-                {/* Bottom padding for tab bar visibility */}
                 <View className="h-32" />
-            </Animated.ScrollView>
+            </ScrollView>
 
             {/* Customization Modal */}
             <ProductCustomizationModal

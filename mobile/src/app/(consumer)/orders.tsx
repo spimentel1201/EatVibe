@@ -85,7 +85,7 @@ export default function OrdersScreen() {
 
                 {/* Orders List */}
                 <View>
-                    {filteredOrders.map((order, index) => (
+                    {filteredOrders.map((order, _index) => (
                         <View
                             key={order.id}
                         >

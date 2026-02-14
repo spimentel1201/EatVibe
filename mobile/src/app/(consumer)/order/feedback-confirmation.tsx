@@ -1,55 +1,45 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
-
 export default function FeedbackConfirmationScreen() {
     const router = useRouter();
 
     const handleGoHome = () => {
-        router.replace('/(consumer)' as any);
+        router.replace('/(consumer)/home' as any);
     };
 
     return (
         <SafeAreaView className="flex-1 bg-white" edges={['top', 'bottom']}>
             <View className="flex-1 items-center justify-center px-6">
-                {/* Success Icon with Animation */}
-                <Animated.View style={animatedStyle} className="mb-8">
+                {/* Success Icon */}
+                <View className="mb-8">
                     <View className="w-32 h-32 rounded-full bg-green-100 items-center justify-center">
                         <Ionicons name="checkmark-circle" size={80} color="#10B981" />
                     </View>
-                </Animated.View>
+                </View>
 
                 {/* Thank You Message */}
-                <Animated.View
-                    entering={FadeIn.delay(300).duration(500)}
-                    className="items-center"
-                >
+                <View className="items-center">
                     <Text className="text-3xl font-black text-gray-900 text-center">
                         Thank You!
                     </Text>
                     <Text className="text-base text-gray-600 text-center mt-4 px-8">
                         Your feedback helps us improve our service and provide better experiences
                     </Text>
-                </Animated.View>
+                </View>
 
                 {/* Confetti Emojis */}
-                <Animated.View
-                    entering={SlideInDown.delay(500).duration(400)}
-                    className="flex-row items-center justify-center mt-8 space-x-4"
-                >
+                <View className="flex-row items-center justify-center mt-8 space-x-4">
                     <Text className="text-4xl">🎉</Text>
                     <Text className="text-4xl">⭐</Text>
                     <Text className="text-4xl">🎊</Text>
-                </Animated.View>
+                </View>
 
                 {/* Stats Card */}
-                <Animated.View
-                    entering={SlideInDown.delay(700).duration(400)}
-                    className="w-full mt-12 bg-gradient-to-r from-[#FF5722] to-[#FF7043] rounded-[32px] p-6"
-                >
+                <View className="w-full mt-12 bg-[#FF5722] rounded-[32px] p-6">
                     <View className="flex-row items-center justify-around">
                         <View className="items-center">
                             <Text className="text-3xl font-black text-white">127</Text>
@@ -66,14 +56,11 @@ export default function FeedbackConfirmationScreen() {
                             <Text className="text-sm text-white/80 mt-1">Satisfaction</Text>
                         </View>
                     </View>
-                </Animated.View>
+                </View>
             </View>
 
             {/* Action Buttons */}
-            <Animated.View
-                entering={SlideInDown.delay(900).duration(400)}
-                className="px-6 pb-8"
-            >
+            <View className="px-6 pb-8">
                 <TouchableOpacity
                     onPress={handleGoHome}
                     className="bg-[#FF5722] h-14 rounded-full items-center justify-center shadow-lg shadow-orange-500/30 mb-3"
@@ -86,7 +73,7 @@ export default function FeedbackConfirmationScreen() {
                 >
                     <Text className="text-gray-900 font-black text-lg">View Orders</Text>
                 </TouchableOpacity>
-            </Animated.View>
+            </View>
         </SafeAreaView>
     );
 }

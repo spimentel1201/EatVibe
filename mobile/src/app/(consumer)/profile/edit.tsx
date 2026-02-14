@@ -4,7 +4,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/features/auth/hooks/useAuth';
-import Animated, { FadeInDown } from 'react-native-reanimated';
 
 export default function EditProfileScreen() {
     const router = useRouter();
@@ -50,12 +49,14 @@ export default function EditProfileScreen() {
                 </View>
 
                 {/* Form Fields */}
-                <Animated.View entering={FadeInDown.duration(400)} className="space-y-6">
+                <View className="space-y-6">
                     {/* Name Input */}
                     <View>
                         <Text className="text-gray-500 font-bold mb-2 ml-1">Full Name</Text>
                         <View className="bg-gray-50 rounded-2xl px-4 py-3 border border-gray-100 flex-row items-center">
-                            <Ionicons name="person-outline" size={20} color="#9CA3AF" className="mr-3" />
+                            <View className="mr-3">
+                                <Ionicons name="person-outline" size={20} color="#9CA3AF" />
+                            </View>
                             <TextInput
                                 value={name}
                                 onChangeText={setName}
@@ -69,7 +70,9 @@ export default function EditProfileScreen() {
                     <View>
                         <Text className="text-gray-500 font-bold mb-2 ml-1">Email Address</Text>
                         <View className="bg-gray-50 rounded-2xl px-4 py-3 border border-gray-100 flex-row items-center">
-                            <Ionicons name="mail-outline" size={20} color="#9CA3AF" className="mr-3" />
+                            <View className="mr-3">
+                                <Ionicons name="mail-outline" size={20} color="#9CA3AF" />
+                            </View>
                             <TextInput
                                 value={email}
                                 onChangeText={setEmail}
@@ -84,7 +87,9 @@ export default function EditProfileScreen() {
                     <View>
                         <Text className="text-gray-500 font-bold mb-2 ml-1">Phone Number</Text>
                         <View className="bg-gray-50 rounded-2xl px-4 py-3 border border-gray-100 flex-row items-center">
-                            <Ionicons name="call-outline" size={20} color="#9CA3AF" className="mr-3" />
+                            <View className="mr-3">
+                                <Ionicons name="call-outline" size={20} color="#9CA3AF" />
+                            </View>
                             <TextInput
                                 value={phone}
                                 onChangeText={setPhone}
@@ -94,7 +99,7 @@ export default function EditProfileScreen() {
                             />
                         </View>
                     </View>
-                </Animated.View>
+                </View>
 
             </ScrollView>
 

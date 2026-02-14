@@ -3,7 +3,6 @@ import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, { FadeInDown } from 'react-native-reanimated';
 
 // Mock payment methods
 const MOCK_PAYMENTS = [
@@ -65,10 +64,9 @@ export default function PaymentsScreen() {
                     </View>
                 ) : (
                     <View className="space-y-6">
-                        {payments.map((pm, index) => (
-                            <Animated.View
+                        {payments.map((pm, _index) => (
+                            <View
                                 key={pm.id}
-                                entering={FadeInDown.delay(index * 100).duration(400)}
                             >
                                 <TouchableOpacity
                                     className="rounded-[24px] p-6 relative overflow-hidden h-48 justify-between shadow-lg shadow-gray-300/50"
@@ -115,7 +113,7 @@ export default function PaymentsScreen() {
                                         </TouchableOpacity>
                                     </View>
                                 </TouchableOpacity>
-                            </Animated.View>
+                            </View>
                         ))}
                     </View>
                 )}
@@ -127,7 +125,9 @@ export default function PaymentsScreen() {
                     onPress={handleAddPayment}
                     className="bg-[#FF5722] h-14 rounded-full items-center justify-center shadow-lg shadow-orange-500/30 flex-row"
                 >
-                    <Ionicons name="add" size={24} color="white" className="mr-2" />
+                    <View className="mr-2">
+                        <Ionicons name="add" size={24} color="white" />
+                    </View>
                     <Text className="text-white font-black text-lg">Add New Card</Text>
                 </TouchableOpacity>
             </View>

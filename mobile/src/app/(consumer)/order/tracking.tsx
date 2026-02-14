@@ -3,8 +3,6 @@ import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, { FadeIn, SlideInDown } from 'react-native-reanimated';
-
 type OrderStatus = 'confirmed' | 'preparing' | 'on_the_way' | 'delivered';
 
 interface OrderStep {
@@ -75,8 +73,7 @@ export default function OrderTrackingScreen() {
 
             <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
                 {/* Map Placeholder */}
-                <Animated.View
-                    entering={FadeIn.duration(400)}
+                <View
                     className="mx-6 mt-6 h-64 bg-gray-100 rounded-[32px] overflow-hidden relative"
                 >
                     {/* Map would go here - using placeholder for now */}
@@ -93,10 +90,10 @@ export default function OrderTrackingScreen() {
                             <Text className="text-sm font-bold text-gray-900 ml-2">{estimatedTime}</Text>
                         </View>
                     </View>
-                </Animated.View>
+                </View>
 
                 {/* Order Status Timeline */}
-                <Animated.View entering={SlideInDown.delay(200).duration(400)} className="px-6 py-6">
+                <View className="px-6 py-6">
                     <Text className="text-lg font-bold text-gray-900 mb-6">Order Status</Text>
                     <View className="space-y-4">
                         {orderSteps.map((step, index) => (
@@ -142,11 +139,10 @@ export default function OrderTrackingScreen() {
                             </View>
                         ))}
                     </View>
-                </Animated.View>
+                </View>
 
                 {/* Courier Info */}
-                <Animated.View
-                    entering={SlideInDown.delay(400).duration(400)}
+                <View
                     className="mx-6 mb-6 bg-gray-50 rounded-[32px] p-6"
                 >
                     <Text className="text-lg font-bold text-gray-900 mb-4">Your Courier</Text>
@@ -171,7 +167,7 @@ export default function OrderTrackingScreen() {
                             </TouchableOpacity>
                         </View>
                     </View>
-                </Animated.View>
+                </View>
 
                 {/* Order Details */}
                 <View className="px-6 pb-8">

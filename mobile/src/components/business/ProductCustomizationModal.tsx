@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Modal, TouchableOpacity, Image, ScrollView, Alert } from 'react-native';
-// import Animated, { SlideInDown } from 'react-native-reanimated';
 import { MenuItem, MenuModifier } from '@/features/restaurant/types';
 import { Ionicons } from '@expo/vector-icons';
 

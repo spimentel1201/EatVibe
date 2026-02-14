@@ -26,10 +26,34 @@ spring:
           filters:
             - AuthenticationFilter
             
+        - id: cart-service
+          uri: ${ORDER_SERVICE_URI:http://localhost:8081}
+          predicates:
+            - Path=/api/v1/cart/**
+          filters:
+            - AuthenticationFilter
+            
         - id: courier-service
           uri: ${COURIER_SERVICE_URI:http://localhost:8086}
           predicates:
-            - Path=/api/v1/couries/**
+            - Path=/api/v1/couriers/**
+          filters:
+            - AuthenticationFilter
+            
+        - id: delivery-service
+          uri: ${COURIER_SERVICE_URI:http://localhost:8086}
+          predicates:
+            - Path=/api/v1/deliveries/**
+          filters:
+            - AuthenticationFilter
+            
+        - id: payment-methods-service
+          uri: ${PAYMENT_SERVICE_URI:http://localhost:8085}
+          predicates:
+            - Path=/api/v1/payment-methods/**
+          filters:
+            - AuthenticationFilter
+            
         - id: payment-service
           uri: ${PAYMENT_SERVICE_URI:http://localhost:8085}
           predicates:

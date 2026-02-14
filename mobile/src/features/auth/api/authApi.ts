@@ -26,6 +26,22 @@ const decodeJWT = (token: string): any => {
     }
 };
 
+// Helper to map backend roles to mobile UserRole
+const mapBackendRoleToMobile = (backendRole: string): UserRole => {
+    switch (backendRole) {
+        case 'ROLE_CUSTOMER':
+            return 'CONSUMER';
+        case 'ROLE_COURIER':
+            return 'COURIER';
+        case 'ROLE_RESTAURANT_ADMIN':
+            return 'RESTAURANT';
+        case 'ROLE_ADMIN':
+            return 'ADMIN';
+        default:
+            return 'CONSUMER'; // Default fallback
+    }
+};
+
 export const authApi = {
     /**
      * Login user with email and password
@@ -39,12 +55,13 @@ export const authApi = {
 
             // Decode JWT to extract user information
             const decoded = decodeJWT(token);
+            const userRole = mapBackendRoleToMobile(role);
 
             const user: User = {
                 id: decoded?.sub || decoded?.userId || '',
                 email: decoded?.email || credentials.email,
                 name: decoded?.name || '',
-                role: role as UserRole,
+                role: userRole,
                 createdAt: ''
             };
 
@@ -67,13 +84,14 @@ export const authApi = {
 
             // Decode JWT to extract user information
             const decoded = decodeJWT(token);
+            const userRole = mapBackendRoleToMobile(role);
 
             const user: User = {
                 id: decoded?.sub || decoded?.userId || '',
                 email: decoded?.email || data.email,
                 name: decoded?.name || data.name,
                 phone: data.phone,
-                role: role as UserRole,
+                role: userRole,
                 createdAt: ''
             };
 

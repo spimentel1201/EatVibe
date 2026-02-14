@@ -49,10 +49,14 @@ export default function LoginScreen() {
         if (!validateForm()) return;
 
         try {
-            await login({ email, password });
+            const user = await login({ email, password });
             // Small delay to ensure state updates before navigation
             setTimeout(() => {
-                router.replace('/(consumer)/home');
+                if (user.role === 'COURIER') {
+                    router.replace('/(courier)/dashboard' as any);
+                } else {
+                    router.replace('/(consumer)/home' as any);
+                }
             }, 100);
         } catch (err) {
             // Error handled by store

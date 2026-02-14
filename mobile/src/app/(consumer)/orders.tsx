@@ -3,76 +3,74 @@ import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-// import Animated, { FadeInDown } from 'react-native-reanimated';
+import { useAuth } from '@/features/auth/hooks/useAuth';
+import { orderApi } from '@/features/order/api/orderApi';
+import { OrderResponse } from '@/features/order/types';
+import { useEffect } from 'react';
+import { RefreshControl, ActivityIndicator } from 'react-native';
 
-const MOCK_ORDERS = [
-    {
-        id: 'ORD-001',
-        restaurant: 'Burger King',
-        date: 'Today, 12:30 PM',
-        status: 'Delivering',
-        price: 45.90,
-        items: '2x Whopper, 1x Large Fries',
-        isActive: true,
-    },
-    {
-        id: 'ORD-002',
-        restaurant: 'Pizza Hut',
-        date: 'Yesterday, 8:15 PM',
-        status: 'Completed',
-        price: 64.00,
-        items: '1x Family Pepperoni, 1x Garlic Bread',
-        isActive: false,
-    },
-    {
-        id: 'ORD-003',
-        restaurant: 'KFC',
-        date: 'Feb 10, 2:45 PM',
-        status: 'Completed',
-        price: 38.50,
-        items: '3x Chicken Bucket, 2x Coleslaw',
-        isActive: false,
-    },
-];
+// MOCK_ORDERS removed
+
 
 export default function OrdersScreen() {
     const router = useRouter();
+    const { user } = useAuth();
     const [activeTab, setActiveTab] = useState<'active' | 'past'>('active');
+    const [orders, setOrders] = useState<OrderResponse[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
 
-    const filteredOrders = MOCK_ORDERS.filter((order) =>
-        activeTab === 'active' ? order.isActive : !order.isActive
+    useEffect(() => {
+        if (user) {
+            fetchOrders();
+        }
+    }, [user]);
+
+    const fetchOrders = async () => {
+        if (!user) return;
+        setIsLoading(true);
+        try {
+            const data = await orderApi.getOrdersByCustomer(user.id);
+            setOrders(data);
+        } catch (error) {
+            console.error('Failed to fetch orders:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const isActiveOrder = (status: any) => {
+        return ['PENDING', 'CONFIRMED', 'PREPARING', 'READY_FOR_PICKUP', 'OUT_FOR_DELIVERY'].includes(status);
+    };
+
+    const filteredOrders = orders.filter((order) =>
+        activeTab === 'active' ? isActiveOrder(order.status) : !isActiveOrder(order.status)
     );
 
     const handleTrackOrder = (orderId: string) => {
-        router.push(`/order/tracking?id=${orderId}` as any);
+        router.push({
+            pathname: '/order/tracking',
+            params: { id: orderId }
+        } as any);
     };
 
-    const handleReorder = (orderId: string) => {
-        // TODO: Implement reorder logic
-        console.log('Reordering:', orderId);
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    };
+
+    const getItemsSummary = (items: any[]) => {
+        if (!items || items.length === 0) return 'No items';
+        return items.map(i => `${i.quantity}x ${i.productName}`).join(', ');
     };
 
     return (
         <SafeAreaView className="flex-1 bg-white" edges={['top']}>
-            <ScrollView className="flex-1 px-6" showsVerticalScrollIndicator={false}>
+            <ScrollView className="flex-1 px-6" showsVerticalScrollIndicator={false}
+                refreshControl={<RefreshControl refreshing={isLoading} onRefresh={fetchOrders} tintColor="#FF5722" />}
+            >
                 {/* Header */}
                 <View className="py-6 flex-row justify-between items-center">
                     <Text className="text-3xl font-black text-gray-900">My Orders</Text>
-                    <View className="flex-row gap-2">
-                        {/* DEV: Test Buttons */}
-                        <TouchableOpacity
-                            onPress={() => router.push('/order/feedback?id=TEST-001' as any)}
-                            className="bg-blue-500 px-3 py-2 rounded-full"
-                        >
-                            <Text className="text-white font-bold text-xs">📝 Feedback</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            onPress={() => router.push('/order/feedback-confirmation' as any)}
-                            className="bg-green-500 px-3 py-2 rounded-full"
-                        >
-                            <Text className="text-white font-bold text-xs">✅ Confirm</Text>
-                        </TouchableOpacity>
-                    </View>
                 </View>
 
                 {/* Tabs */}
@@ -97,30 +95,34 @@ export default function OrdersScreen() {
 
                 {/* Orders List */}
                 <View>
-                    {filteredOrders.map((order, _index) => (
+                    {filteredOrders.map((order) => (
                         <View
                             key={order.id}
                         >
                             <TouchableOpacity
-                                onPress={() => order.isActive && handleTrackOrder(order.id)}
+                                onPress={() => isActiveOrder(order.status) && handleTrackOrder(order.id)}
+                                disabled={!isActiveOrder(order.status)}
                                 className="bg-gray-50/50 rounded-[32px] p-6 mb-6 border border-gray-100 shadow-sm shadow-gray-200/50"
                             >
                                 <View className="flex-row justify-between items-start mb-4">
                                     <View>
-                                        <Text className="text-xl font-black text-gray-900">{order.restaurant}</Text>
+                                        <Text className="text-xl font-black text-gray-900">
+                                            {/* TODO: Fetch restaurant name or store it in Order */}
+                                            Restaurant
+                                        </Text>
                                         <Text className="text-gray-400 text-xs font-bold uppercase mt-1 tracking-widest">
-                                            {order.date}
+                                            {formatDate(order.createdAt)}
                                         </Text>
                                     </View>
                                     <View
-                                        className={`px-4 py-1.5 rounded-full ${order.status === 'Delivering' ? 'bg-orange-100' : 'bg-green-100'
+                                        className={`px-4 py-1.5 rounded-full ${order.status === 'OUT_FOR_DELIVERY' ? 'bg-orange-100' : 'bg-green-100'
                                             }`}
                                     >
                                         <Text
-                                            className={`font-bold text-xs ${order.status === 'Delivering' ? 'text-orange-600' : 'text-green-600'
+                                            className={`font-bold text-xs ${order.status === 'OUT_FOR_DELIVERY' ? 'text-orange-600' : 'text-green-600'
                                                 }`}
                                         >
-                                            {order.status}
+                                            {order.status.replace(/_/g, ' ')}
                                         </Text>
                                     </View>
                                 </View>
@@ -128,13 +130,13 @@ export default function OrdersScreen() {
                                 <View className="flex-row items-center border-t border-gray-100 pt-4 mt-2">
                                     <View className="flex-1">
                                         <Text className="text-gray-500 text-sm italic" numberOfLines={1}>
-                                            {order.items}
+                                            {getItemsSummary(order.items)}
                                         </Text>
                                         <Text className="text-gray-900 font-black text-lg mt-1">
-                                            S/ {order.price.toFixed(2)}
+                                            S/ {order.totalAmount.toFixed(2)}
                                         </Text>
                                     </View>
-                                    {order.isActive ? (
+                                    {isActiveOrder(order.status) ? (
                                         <TouchableOpacity
                                             onPress={() => handleTrackOrder(order.id)}
                                             className="bg-[#FF5722] px-6 py-3 rounded-full"
@@ -143,8 +145,9 @@ export default function OrdersScreen() {
                                         </TouchableOpacity>
                                     ) : (
                                         <TouchableOpacity
-                                            onPress={() => handleReorder(order.id)}
-                                            className="bg-gray-900 px-6 py-3 rounded-full"
+                                            // onPress={() => handleReorder(order.id)}
+                                            className="bg-gray-900 px-6 py-3 rounded-full opacity-50"
+                                            disabled
                                         >
                                             <Text className="text-white font-bold">Reorder</Text>
                                         </TouchableOpacity>
@@ -156,7 +159,7 @@ export default function OrdersScreen() {
                 </View>
 
                 {/* Empty State */}
-                {filteredOrders.length === 0 && (
+                {filteredOrders.length === 0 && !isLoading && (
                     <View className="py-20 items-center">
                         <Ionicons name="receipt-outline" size={80} color="#D1D5DB" />
                         <Text className="text-xl font-bold text-gray-900 mt-6">
@@ -167,6 +170,11 @@ export default function OrdersScreen() {
                                 ? 'Hungry? Order something delicious and it will appear here!'
                                 : 'Your order history will appear here'}
                         </Text>
+                    </View>
+                )}
+                {isLoading && (
+                    <View className="py-20 items-center">
+                        <ActivityIndicator size="large" color="#FF5722" />
                     </View>
                 )}
             </ScrollView>

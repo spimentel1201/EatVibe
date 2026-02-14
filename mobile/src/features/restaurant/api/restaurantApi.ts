@@ -4,9 +4,7 @@ import type {
     MenuItem,
     Category,
     RestaurantSearchParams,
-    RestaurantResponse,
-    MenuItemResponse,
-    CategoryResponse
+    RestaurantResponse
 } from '../types';
 
 // Mappers
@@ -94,7 +92,7 @@ export const getRestaurantDetails = async (id: string): Promise<RestaurantRespon
         const response = await apiClient.get(`/restaurants/${id}`);
         return response.data as RestaurantResponse;
     } catch (error) {
-        console.error(`Error fetching restaurant ${id}:`, error);
+        console.error(`Error fetching restaurant ${id}: `, error);
         return null;
     }
 };

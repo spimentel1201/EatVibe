@@ -100,15 +100,22 @@ const darkMapStyle = [
     }
 ];
 
+import { orderApi } from '@/features/order/api/orderApi';
+import { OrderResponse } from '@/features/order/types';
+
+// ... imports ...
+
 export default function OrderTrackingScreen() {
     const router = useRouter();
     const params = useLocalSearchParams();
-    const orderId = params.id as string || '8824';
+    const orderId = params.id as string;
     const mapRef = useRef<any>(null);
 
-    const [currentStatus, _setCurrentStatus] = useState<OrderStatus>('on_the_way');
-    const [estimatedTime] = useState('12 mins');
+    const [order, setOrder] = useState<OrderResponse | null>(null);
+    const [currentStatus, setCurrentStatus] = useState<OrderStatus>('confirmed');
+    const [estimatedTime, setEstimatedTime] = useState('15-20 mins');
 
+    // ... coordinates ...
     // Coordinates - Lima, Peru (Miraflores area)
     const restaurantLocation = {
         latitude: -12.1191,
@@ -133,6 +140,66 @@ export default function OrderTrackingScreen() {
         avatar: 'https://i.pravatar.cc/150?img=33',
         isOnline: true,
     };
+
+    useEffect(() => {
+        if (orderId) {
+            fetchOrder();
+            const interval = setInterval(fetchOrder, 10000); // Poll every 10s
+            return () => clearInterval(interval);
+        }
+    }, [orderId]);
+
+    const fetchOrder = async () => {
+        try {
+            const data = await orderApi.getOrderById(orderId);
+            setOrder(data);
+            mapStatus(data.status);
+            if (data.estimatedDeliveryTime) {
+                const date = new Date(data.estimatedDeliveryTime);
+                const now = new Date();
+                const diffMs = date.getTime() - now.getTime();
+                const diffMins = Math.max(0, Math.ceil(diffMs / (1000 * 60)));
+                setEstimatedTime(`${diffMins} mins`);
+            }
+        } catch (error) {
+            console.error('Error fetching order:', error);
+        }
+    };
+
+    const mapStatus = (backendStatus: string) => {
+        switch (backendStatus) {
+            case 'PENDING':
+            case 'CONFIRMED':
+                setCurrentStatus('confirmed');
+                break;
+            case 'PREPARING':
+            case 'READY_FOR_PICKUP':
+                setCurrentStatus('preparing');
+                break;
+            case 'OUT_FOR_DELIVERY':
+                setCurrentStatus('on_the_way');
+                break;
+            case 'DELIVERED':
+                setCurrentStatus('delivered');
+                break;
+            default:
+                setCurrentStatus('confirmed');
+        }
+    };
+
+    // Simulate courier movement (replace with real-time updates from backend)
+    useEffect(() => {
+        if (currentStatus === 'on_the_way') {
+            const interval = setInterval(() => {
+                setCourierLocation(prev => ({
+                    latitude: prev.latitude + (Math.random() - 0.5) * 0.0005,
+                    longitude: prev.longitude + (Math.random() - 0.5) * 0.0005,
+                }));
+            }, 3000);
+
+            return () => clearInterval(interval);
+        }
+    }, [currentStatus]);
 
     const getStatusStep = (status: OrderStatus): number => {
         const steps = { confirmed: 0, preparing: 1, on_the_way: 2, delivered: 3 };
@@ -239,7 +306,7 @@ export default function OrderTrackingScreen() {
                         <Ionicons name="chevron-back" size={24} color="#000" />
                     </TouchableOpacity>
 
-                    <Text className="text-lg font-bold text-white">Order #{orderId}</Text>
+                    <Text className="text-lg font-bold text-white">Order #{order?.id?.substring(0, 8) || orderId}</Text>
 
                     <TouchableOpacity className="w-12 h-12 rounded-full bg-white items-center justify-center shadow-lg">
                         <Ionicons name="help-circle-outline" size={24} color="#000" />

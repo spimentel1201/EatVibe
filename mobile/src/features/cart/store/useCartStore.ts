@@ -10,8 +10,19 @@ export const useCartStore = create(
             items: [],
             restaurantId: null,
 
-            addItem: (item: MenuItem, quantity: number) => {
-                const { items } = get();
+            addItem: (item: MenuItem, quantity: number, restaurantId: string) => {
+                const { items, restaurantId: currentRestaurantId } = get();
+
+                // Check if adding item from different restaurant
+                if (currentRestaurantId && currentRestaurantId !== restaurantId) {
+                    // Logic to clear cart and start new order
+                    // ideally we should ask user, but for now we reset
+                    set({ items: [], restaurantId });
+                    // Note: In a real app, returning 'false' or throwing error to trigger UI confirmation is better
+                } else if (!currentRestaurantId) {
+                    set({ restaurantId });
+                }
+
                 const existingItem = items.find((i: CartItem) => i.id === item.id);
 
                 if (existingItem) {

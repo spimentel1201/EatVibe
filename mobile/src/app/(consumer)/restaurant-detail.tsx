@@ -25,7 +25,9 @@ export default function RestaurantDetailScreen() {
 
     const handleAddToCart = (quantity: number, selectedModifiers: any) => {
         if (selectedItem) {
-            addItem(selectedItem, quantity);
+            if (restaurant?.id) {
+                addItem(selectedItem, quantity, restaurant.id);
+            }
             setModalVisible(false);
             console.log('Added to cart with modifiers:', selectedModifiers);
         }

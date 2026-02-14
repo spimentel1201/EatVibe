@@ -5,6 +5,10 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useCartStore } from '@/features/cart/store/useCartStore';
 import { CartItem } from '@/features/cart/types';
+import { useAuth } from '@/features/auth/hooks/useAuth';
+import { cartApi } from '@/features/cart/api/cartApi';
+import { orderApi } from '@/features/order/api/orderApi';
+import { Alert, ActivityIndicator } from 'react-native';
 
 type PaymentMethodType = 'yape' | 'mastercard';
 
@@ -20,15 +24,60 @@ export default function CheckoutScreen() {
     const serviceFee = 13.0;
     const total = subtotal + deliveryFee + serviceFee + riderTip;
 
-    const handlePlaceOrder = () => {
-        // TODO: Implement order placement logic with backend
-        console.log('Placing order...');
+    const [isLoading, setIsLoading] = useState(false);
+    const { user } = useAuth(); // Assuming useAuth is available
 
-        // Clear cart after successful order
-        clearCart();
+    // ... codes ...
 
-        // Navigate to order tracking
-        router.push('/order/tracking?id=ORD-001' as any);
+    const handlePlaceOrder = async () => {
+        if (!user || !items.length) return;
+
+        setIsLoading(true);
+        try {
+            // 1. Sync Cart with Backend
+            // We assume all items are from the same restaurant as enforced by store
+            const restaurantId = useCartStore.getState().restaurantId;
+
+            if (!restaurantId) {
+                Alert.alert('Error', 'Invalid cart state');
+                return;
+            }
+
+            console.log('Syncing cart for user:', user.id);
+            await cartApi.syncCart(user.id, restaurantId, items);
+
+            // 2. Create Order
+            console.log('Creating order...');
+            // Determine delivery address ID: use first saved address or a placeholder
+            // Since we don't have address management yet, we use a random UUID if validated,
+            // or we assume the backend ignores it (as seen in UseCase).
+            // REAL IMPLEMENTATION: Fetch user addresses -> select one -> use ID.
+            const dummyAddressId = '00000000-0000-0000-0000-000000000000'; // Placeholder
+
+            const order = await orderApi.createOrder({
+                customerId: user.id,
+                restaurantId: restaurantId,
+                deliveryAddressId: dummyAddressId,
+                deliveryFee: deliveryFee
+            });
+
+            console.log('Order created:', order.id);
+
+            // 3. Clear local cart
+            clearCart();
+
+            // 4. Navigate to success/tracking
+            router.push({
+                pathname: '/order/tracking',
+                params: { id: order.id }
+            } as any);
+
+        } catch (error: any) {
+            console.error('Checkout error:', error);
+            Alert.alert('Error', 'Failed to place order. Please try again.');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     // Handle empty cart
@@ -165,8 +214,8 @@ export default function CheckoutScreen() {
                         <TouchableOpacity
                             onPress={() => setSelectedPayment('mastercard')}
                             className={`flex-1 rounded-2xl p-4 border-2 ${selectedPayment === 'mastercard'
-                                    ? 'bg-white border-[#FF5722]'
-                                    : 'bg-white border-gray-200'
+                                ? 'bg-white border-[#FF5722]'
+                                : 'bg-white border-gray-200'
                                 }`}
                         >
                             <View className="flex-row items-center justify-between mb-2">
@@ -198,11 +247,17 @@ export default function CheckoutScreen() {
                 <View className="mx-5 mb-4">
                     <TouchableOpacity
                         onPress={handlePlaceOrder}
-                        className="bg-[#FF5722] h-14 rounded-full items-center justify-center shadow-lg shadow-orange-500/30"
+                        disabled={isLoading}
+                        className={`h-14 rounded-full items-center justify-center shadow-lg shadow-orange-500/30 ${isLoading ? 'bg-orange-300' : 'bg-[#FF5722]'
+                            }`}
                     >
-                        <Text className="text-white font-bold text-base">
-                            Place Order                ${total.toFixed(2)}
-                        </Text>
+                        {isLoading ? (
+                            <ActivityIndicator color="white" />
+                        ) : (
+                            <Text className="text-white font-bold text-base">
+                                Place Order                ${total.toFixed(2)}
+                            </Text>
+                        )}
                     </TouchableOpacity>
                 </View>
 

@@ -1,42 +1,73 @@
 import { Coordinates } from '@/core/api/types';
 
-// Restaurant types
+// Backend DTOs
+export type RestaurantStatus = 'OPEN' | 'CLOSED' | 'BUSY';
+
+export interface RestaurantResponse {
+    id: string;
+    ownerUserId: string;
+    name: string;
+    description: string;
+    status: RestaurantStatus;
+    rating: number;
+    imageUrl: string;
+    createdAt: string;
+    categories: CategoryResponse[];
+}
+
+export interface CategoryResponse {
+    id: string;
+    name: string;
+    sortOrder: number;
+    menuItems: MenuItemResponse[];
+}
+
+export interface MenuItemResponse {
+    id: string;
+    name: string;
+    description: string;
+    price: number;
+    available: boolean;
+    imageUrl: string;
+}
+
+// UI Models (Adapted from Backend)
 export interface Restaurant {
     id: string;
     name: string;
     description: string;
-    image: string;
+    image: string; // mapped from imageUrl
     rating: number;
-    reviewCount: number;
-    deliveryTime: string; // e.g., "25-35 min"
-    deliveryFee: number;
-    minimumOrder: number;
-    distance?: number; // in kilometers
-    isOpen: boolean;
-    categories: string[];
-    location: Coordinates;
-    address: string;
+    reviewCount: number; // Mocked (backend missing)
+    deliveryTime: string; // Mocked (backend missing)
+    deliveryFee: number; // Mocked (backend missing)
+    minimumOrder: number; // Mocked (backend missing)
+    distance?: number; // Mocked (backend missing)
+    isOpen: boolean; // mapped from status
+    categories: string[]; // mapped from CategoryResponse names
+    location: Coordinates; // Mocked (backend missing)
+    address: string; // Mocked (backend missing)
 }
 
-// Category types
+// Category for UI (Simple list)
 export interface Category {
     id: string;
     name: string;
-    icon: string;
-    slug: string;
+    icon?: string; // Backend doesn't have icons yet
+    slug?: string;
 }
 
-// Menu Item types
+// Menu Item for UI
 export interface MenuItem {
     id: string;
     name: string;
     description: string;
     price: number;
     image?: string;
-    category: string;
-    isAvailable: boolean;
-    preparationTime?: number; // in minutes
-    modifiers?: MenuModifier[];
+    category: string; // Mapped from parent category
+    isAvailable: boolean; // mapped from available
+    preparationTime?: number; // Mocked
+    modifiers?: MenuModifier[]; // Mocked (backend missing)
 }
 
 export interface MenuModifier {

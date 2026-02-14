@@ -1,88 +1,108 @@
-# 🚴‍♂️ Módulo Courier - Documentación Técnica
+# 🚴‍♂️ Módulo Courier - EatVibe
 
-Bienvenido a la documentación técnica del módulo para repartidores de **EatVibe**. Este directorio contiene toda la información detallada sobre los flujos, pantallas, funcionalidades y estado actual del desarrollo de la aplicación para couriers.
-
----
-
-## 📚 Índice de Documentación
-
-### 🚀 1. Flujo de Entrega (Core Loop)
-Documentación relacionada con el ciclo de vida de un pedido, desde que se recibe hasta que se completa.
-
-| Documento | Descripción |
-|-----------|-------------|
-| [Incoming Order](./COURIER_INCOMING_ORDER.md) | Pantalla de notificación de nuevo pedido. Detalles sobre aceptación/rechazo y timers. |
-| [Active Delivery](./COURIER_ACTIVE_DELIVERY.md) | Panel principal durante una entrega activa. Incluye gestión de estados (pickup/dropoff). |
-| [Proof of Delivery](./COURIER_PROOF_OF_DELIVERY.md) | Proceso de validación de entrega (PIN, firma o foto). |
-| [Delivery Completed](./COURIER_DELIVERY_COMPLETED.md) | Resumen post-entrega, desglose de ganancias del pedido y feedback. |
-| [Trip Details](./COURIER_TRIP_DETAILS.md) | Vista detallada de un pedido finalizado en el historial. |
-
-### 💰 2. Sistema de Ganancias
-Gestión financiera, historial de pagos y métricas de desempeño.
-
-| Documento | Descripción |
-|-----------|-------------|
-| [Earnings Hub](./COURIER_EARNINGS_HUB.md) | Dashboard financiero. Muestra ganancias actuales, gráficas semanales y balance disponible. |
-| [Financial History](./COURIER_FINANCIAL_HISTORY.md) | Historial detallado de todas las transacciones (pagos, bonos, propinas). |
-| [Trip History](./COURIER_TRIP_HISTORY.md) | Listado histórico de todos los viajes realizados con filtros por fecha. |
-
-### 👤 3. Perfil y Configuración
-Gestión de la cuenta del repartidor y preferencias de la aplicación.
-
-| Documento | Descripción |
-|-----------|-------------|
-| [Dashboard](./COURIER_DASHBOARD.md) | Pantalla de inicio ("Home"). Resumen de actividad, estado online/offline y mapa de calor. |
-| [Profile & Settings](./COURIER_PROFILE_SETTINGS.md) | Configuración de cuenta, gestión de vehículos, documentos legales y preferencias de app. |
-
-### 🛠️ 4. Especificaciones Técnicas
-Detalles sobre implementaciones específicas y deuda técnica.
-
-| Documento | Descripción |
-|-----------|-------------|
-| [Camera Functionality](./COURIER_CAMERA_FUNCTIONALITY.md) | Especificaciones para el uso de la cámara (escaneo de documentos, verificación facial). |
-| [Pantallas Faltantes](./COURIER_PANTALLAS_FALTANTES.md) | Listado de features pendientes y deuda técnica (Gamificación, Referidos, etc.). |
+Bienvenido a la documentación central del módulo de repartidores (**Courier**) de EatVibe Mobile. Este repositorio contiene toda la estructura, flujos y definiciones de las pantallas implementadas para la gestión de entregas.
 
 ---
 
-## 📊 Estado del Proyecto
+## 🏗️ Estructura del Proyecto
 
-**Progreso Actual: 79% (22/28 Pantallas Completadas)**
-
-### ✅ Lo que está listo
-- **Flujo Principal Completo**: Desde la aceptación del pedido hasta la entrega final.
-- **Navegación**: Implementación de `expo-router` con Tabs y Stacks para una navegación fluida.
-- **Gestión Financiera**: Visualización de ganancias y solicitud de retiros.
-- **Gestión de Perfil**: Edición de datos, vehículos y documentos.
-
-### 🚧 Lo que falta (Next Steps)
-Las siguientes funcionalidades están pendientes y documentadas en [Pantallas Faltantes](./COURIER_PANTALLAS_FALTANTES.md):
-1. **Gamificación**: Leaderboards y sistema de niveles.
-2. **Promociones**: Visualización de bonos activos.
-3. **Programa de Referidos**: Invitar a otros couriers.
-4. **Sistema de Notificaciones**: Centro de mensajes in-app.
-
----
-
-## 🏗️ Arquitectura y Estructura
-
-El módulo se encuentra en `src/app/(courier)/` y sigue una arquitectura basada en **Expo Router**.
+El módulo de Courier se encuentra bajo `src/app/(courier)/` y utiliza **Expo Router** para la navegación basada en archivos.
 
 ```bash
 src/app/(courier)/
-├── dashboard/      # Home Screen
-├── delivery/       # Flujo activo (Mapas, Contacto, Reportes)
-├── earnings/       # Finanzas y Retiros
-├── trips/          # Historial de viajes
-├── profile/        # Configuración de cuenta
-└── order/          # Gestión de pedidos entrantes
+├── _layout.tsx              # Configuración del Tab Navigator principal (Home, Earnings, Trips, Profile)
+├── dashboard/               # 🏠 Home Screen (Inicio, estado online/offline, mapa de calor)
+├── delivery/                # 🚀 Flujo Activo de Entrega
+│   ├── active.tsx           # Seguimiento en tiempo real (mapa, ruta)
+│   ├── navigate.tsx         # Navegación detallada
+│   ├── proof.tsx            # Captura de prueba de entrega (PIN/Foto)
+│   ├── completed.tsx        # Resumen de entrega finalizada
+│   ├── contact-customer.tsx # Chat/Llamada con cliente
+│   ├── contact-restaurant.tsx # Chat/Llamada con restaurante
+│   └── report-issue.tsx     # Reporte de incidencias
+├── order/                   # 📦 Gestión de Pedidos Entrantes
+│   ├── incoming.tsx         # Notificación de nuevo pedido (Aceptar/Rechazar)
+│   └── [id].tsx             # Detalles del pedido antes de aceptar
+├── earnings/                # 💰 Gestión Financiera
+│   ├── index.tsx            # Dashboard de ganancias
+│   ├── history.tsx          # Historial de transacciones
+│   └── cash-out.tsx         # Retiro de fondos
+├── trips/                   # 📜 Historial de Viajes
+│   ├── index.tsx            # Lista de viajes realizados
+│   └── [id].tsx             # Detalle de un viaje específico
+├── profile/                 # 👤 Perfil y Configuración
+│   ├── index.tsx            # Menú principal de perfil
+│   ├── vehicle.tsx          # Gestión de vehículos
+│   ├── documents.tsx        # Documentos legales y licencias
+│   ├── bank.tsx             # Datos bancarios
+│   └── settings.tsx         # Preferencias de la aplicación
+└── support/                 # 🆘 Soporte y Ayuda
+    └── index.tsx            # Centro de ayuda
 ```
-
-### Tecnologías Clave
-- **Mapas**: `react-native-maps` con estilos personalizados oscuros.
-- **UI**: Tailwind CSS (`NativeWind`) con un tema oscuro consistente (`bg-[#0A0E27]`).
-- **Navegación**: Tab Bar personalizado y Stacks anidados.
 
 ---
 
-**Última actualización**: 14 de febrero de 2026
-**Mantenido por**: Equipo de Desarrollo Mobile
+## 🔄 Flujo de Navegación Principal
+
+El siguiente diagrama describe cómo el usuario interactúa con la aplicación durante un ciclo típico de entrega y gestión:
+
+```mermaid
+graph TD
+    A[🏠 Dashboard (Home)] -->|Go Online| B(Esperando Pedidos)
+    B -->|Nuevo Pedido| C{Incoming Order}
+    C -->|Rechazar| B
+    C -->|Aceptar| D[📦 Order Details]
+    D --> E[🚀 Active Delivery]
+    
+    subgraph Flujo de Entrega
+    E --> F[📍 Navegación al Restaurante]
+    F --> G[🍽️ Recogida (Pickup)]
+    G --> H[📍 Navegación al Cliente]
+    H --> I[🏠 Llegada al Cliente]
+    I --> J[📸 Proof of Delivery]
+    J --> K[✅ Delivery Completed]
+    end
+    
+    K --> A
+    
+    subgraph Gestión y Configuración
+    A --> L[💰 Earnings Hub]
+    L --> M[Cash Out]
+    A --> N[📜 Trip History]
+    A --> O[👤 Profile]
+    O --> P[Vehículos / Documentos]
+    end
+```
+
+---
+
+## ✅ Pantallas Implementadas
+
+Actualmente, el módulo cuenta con las siguientes pantallas totalmente funcionales (UI):
+
+### 1. Core Loop (Entrega)
+- **Incoming Order**: Pantalla de alerta con timer para aceptar pedidos.
+- **Active Delivery**: Mapa en tiempo real con estados del pedido.
+- **Navigation**: Interfaz de navegación paso a paso.
+- **Proof of Delivery**: Validación de entrega mediante PIN o foto.
+- **Delivery Completed**: Resumen de ganancias y éxito del pedido.
+- **Contact Screens**: Comunicación con Cliente y Restaurante.
+- **Report Issue**: Flujo para reportar problemas.
+
+### 2. Finanzas (Earnings)
+- **Earnings Hub**: Gráficas de ingresos semanales y balance actual.
+- **Transaction History**: Lista detallada de pagos y bonos.
+- **Cash Out**: Funcionalidad para solicitar transferencias inmediatas.
+
+### 3. Historial (Trips)
+- **Trips List**: Historial de pedidos completados filtrados por fecha.
+- **Trip Details**: Desglose completo de un pedido pasado (ruta, pago, tiempos).
+
+### 4. Perfil (Profile)
+- **Profile Dashboard**: Vista general del usuario y estadísticas.
+- **My Vehicle**: Registro y edición de vehículos.
+- **Documents**: Estado de validez de licencias y seguros.
+- **Bank Details**: Gestión de cuentas para depósitos.
+- **App Settings**: Preferencias de notificaciones y navegación.
+
+---

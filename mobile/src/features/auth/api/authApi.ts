@@ -45,6 +45,7 @@ export const authApi = {
                 email: decoded?.email || credentials.email,
                 name: decoded?.name || '',
                 role: role as UserRole,
+                createdAt: ''
             };
 
             return { user, accessToken: token, refreshToken };
@@ -73,6 +74,7 @@ export const authApi = {
                 name: decoded?.name || data.name,
                 phone: data.phone,
                 role: role as UserRole,
+                createdAt: ''
             };
 
             return { user, accessToken: token, refreshToken };

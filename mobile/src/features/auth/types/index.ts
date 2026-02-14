@@ -1,12 +1,14 @@
 // User types
+export type UserRole = 'CONSUMER' | 'COURIER' | 'RESTAURANT' | 'ADMIN';
+
 export interface User {
     id: string;
     email: string;
     name: string;
     phone?: string;
     avatar?: string;
-    role: 'CONSUMER' | 'COURIER' | 'RESTAURANT' | 'ADMIN';
-    createdAt: string;
+    role: UserRole;
+    createdAt?: string;
 }
 
 // Auth request types

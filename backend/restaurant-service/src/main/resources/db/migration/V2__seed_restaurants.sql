@@ -24,10 +24,9 @@ ON CONFLICT (id) DO NOTHING;
 -- Menu Items for Burger King
 INSERT INTO menu_items (id, category_id, name, description, price, available, image_url)
 VALUES
-    (gen_random_uuid(), '11111111-1111-1111-1111-111111111112', 'Whopper', 'Grilled beef patty with lettuce and tomato', 5.99, true, 'https://res.cloudinary.com/demo/image/upload/v1649320265/food/whopper.jpg'),
-    (gen_random_uuid(), '11111111-1111-1111-1111-111111111112', 'Cheeseburger', 'Classic cheeseburger', 2.99, true, 'https://res.cloudinary.com/demo/image/upload/v1649320265/food/cheeseburger.jpg'),
-    (gen_random_uuid(), '11111111-1111-1111-1111-111111111113', 'Coke', 'Refreshing cola', 1.99, true, 'https://res.cloudinary.com/demo/image/upload/v1649320265/food/coke.jpg')
-ON CONFLICT DO NOTHING;
+    ('11111111-1111-1111-1111-111111111114', '11111111-1111-1111-1111-111111111112', 'Whopper', 'Grilled beef patty with lettuce and tomato', 5.99, true, 'https://res.cloudinary.com/demo/image/upload/v1649320265/food/whopper.jpg'),
+    ('11111111-1111-1111-1111-111111111115', '11111111-1111-1111-1111-111111111112', 'Cheeseburger', 'Classic cheeseburger', 2.99, true, 'https://res.cloudinary.com/demo/image/upload/v1649320265/food/cheeseburger.jpg'),
+    ('11111111-1111-1111-1111-111111111116', '11111111-1111-1111-1111-111111111113', 'Coke', 'Refreshing cola', 1.99, true, 'https://res.cloudinary.com/demo/image/upload/v1649320265/food/coke.jpg')ON CONFLICT DO NOTHING;
 
 
 -- Restaurant 2: Sushi Master (Asian)

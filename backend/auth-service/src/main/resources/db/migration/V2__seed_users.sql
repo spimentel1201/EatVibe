@@ -2,7 +2,7 @@
 -- Admin
 INSERT INTO users (id, email, password_hash, full_name, role) 
 VALUES (
-    gen_random_uuid(),
+    'aaaa0000-aaaa-0000-aaaa-000000000000',
     'admin@foodrush.com', 
     '$2b$10$tmpxVyLm1y1Cv2rJI2GnguBEl5E0BLPGawJ26onVPrnRIMMSejYby', 
     'Super Admin', 
@@ -12,7 +12,7 @@ VALUES (
 -- Restaurant Admins
 INSERT INTO users (id, email, password_hash, full_name, role)
 VALUES (
-    gen_random_uuid(),
+    'aaaa1111-aaaa-1111-aaaa-111111111111',
     'manager.bk@foodrush.com', 
     '$2b$10$tmpxVyLm1y1Cv2rJI2GnguBEl5E0BLPGawJ26onVPrnRIMMSejYby', 
     'BK Manager', 
@@ -21,7 +21,7 @@ VALUES (
 
 INSERT INTO users (id, email, password_hash, full_name, role)
 VALUES (
-    gen_random_uuid(),
+    'bbbb2222-bbbb-2222-bbbb-222222222222',
     'manager.sushi@foodrush.com', 
     '$2b$10$tmpxVyLm1y1Cv2rJI2GnguBEl5E0BLPGawJ26onVPrnRIMMSejYby', 
     'Sushi Manager', 
@@ -31,7 +31,7 @@ VALUES (
 -- Couriers
 INSERT INTO users (id, email, password_hash, full_name, role)
 VALUES (
-    gen_random_uuid(),
+    'cccc1111-cccc-1111-cccc-111111111111',
     'courier.juan@foodrush.com', 
     '$2b$10$tmpxVyLm1y1Cv2rJI2GnguBEl5E0BLPGawJ26onVPrnRIMMSejYby', 
     'Juan Perez', 
@@ -40,7 +40,7 @@ VALUES (
 
 INSERT INTO users (id, email, password_hash, full_name, role)
 VALUES (
-    gen_random_uuid(),
+    'cccc2222-cccc-2222-cccc-222222222222',
     'courier.maria@foodrush.com', 
     '$2b$10$tmpxVyLm1y1Cv2rJI2GnguBEl5E0BLPGawJ26onVPrnRIMMSejYby', 
     'Maria Gomez', 
@@ -50,7 +50,7 @@ VALUES (
 -- Customers
 INSERT INTO users (id, email, password_hash, full_name, role)
 VALUES (
-    gen_random_uuid(),
+    'dddd1111-dddd-1111-dddd-111111111111',
     'customer.alex@foodrush.com', 
     '$2b$10$tmpxVyLm1y1Cv2rJI2GnguBEl5E0BLPGawJ26onVPrnRIMMSejYby', 
     'Alex Customer', 
@@ -59,7 +59,7 @@ VALUES (
 
 INSERT INTO users (id, email, password_hash, full_name, role)
 VALUES (
-    gen_random_uuid(),
+    'dddd2222-dddd-2222-dddd-222222222222',
     'customer.laura@foodrush.com', 
     '$2b$10$tmpxVyLm1y1Cv2rJI2GnguBEl5E0BLPGawJ26onVPrnRIMMSejYby', 
     'Laura Client', 

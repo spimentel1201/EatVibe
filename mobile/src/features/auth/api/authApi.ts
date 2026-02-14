@@ -1,5 +1,9 @@
-import { apiClient } from '../../../core/api/client';
-import { AuthResponse, LoginRequest, RegisterRequest, User, UserRole } from '../types';
+import axios from 'axios';
+import { LoginRequest, RegisterRequest, User, UserRole } from '../types';
+
+// Auth service doesn't use /api/v1 prefix, so we need a separate base URL
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
+const AUTH_BASE_URL = API_BASE_URL.replace('/api/v1', '');
 
 export const authApi = {
     /**
@@ -9,7 +13,7 @@ export const authApi = {
         credentials: LoginRequest
     ): Promise<{ user: User; accessToken: string; refreshToken: string }> => {
         try {
-            const response = await apiClient.post('/auth/login', credentials);
+            const response = await axios.post(`${AUTH_BASE_URL}/auth/login`, credentials);
             const { token, refreshToken, role } = response.data;
 
             // Backend doesn't return full user object, construct it from response
@@ -35,7 +39,7 @@ export const authApi = {
         data: RegisterRequest
     ): Promise<{ user: User; accessToken: string; refreshToken: string }> => {
         try {
-            const response = await apiClient.post('/auth/register', data);
+            const response = await axios.post(`${AUTH_BASE_URL}/auth/register`, data);
             const { token, refreshToken, role } = response.data;
 
             const user: User = {

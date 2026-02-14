@@ -5,6 +5,27 @@ import { LoginRequest, RegisterRequest, User, UserRole } from '../types';
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
 const AUTH_BASE_URL = API_BASE_URL.replace('/api/v1', '');
 
+/**
+ * Decode JWT token to extract user information
+ * Note: This is a simple base64 decode, not cryptographic verification
+ */
+const decodeJWT = (token: string): any => {
+    try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(
+            atob(base64)
+                .split('')
+                .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+                .join('')
+        );
+        return JSON.parse(jsonPayload);
+    } catch (error) {
+        console.error('Error decoding JWT:', error);
+        return null;
+    }
+};
+
 export const authApi = {
     /**
      * Login user with email and password
@@ -16,12 +37,13 @@ export const authApi = {
             const response = await axios.post(`${AUTH_BASE_URL}/auth/login`, credentials);
             const { token, refreshToken, role } = response.data;
 
-            // Backend doesn't return full user object, construct it from response
-            // TODO: Add endpoint to get user profile or decode from JWT
+            // Decode JWT to extract user information
+            const decoded = decodeJWT(token);
+
             const user: User = {
-                id: '', // Will be populated from JWT decode or separate /me endpoint
-                email: credentials.email,
-                name: '',
+                id: decoded?.sub || decoded?.userId || '',
+                email: decoded?.email || credentials.email,
+                name: decoded?.name || '',
                 role: role as UserRole,
             };
 
@@ -42,10 +64,13 @@ export const authApi = {
             const response = await axios.post(`${AUTH_BASE_URL}/auth/register`, data);
             const { token, refreshToken, role } = response.data;
 
+            // Decode JWT to extract user information
+            const decoded = decodeJWT(token);
+
             const user: User = {
-                id: '',
-                email: data.email,
-                name: data.name,
+                id: decoded?.sub || decoded?.userId || '',
+                email: decoded?.email || data.email,
+                name: decoded?.name || data.name,
                 phone: data.phone,
                 role: role as UserRole,
             };
